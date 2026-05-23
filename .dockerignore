@@ -1,0 +1,8 @@
+node_modules
+stockwise.db
+error.log
+server*.log
+.git
+.github
+.vscode
+*.bat

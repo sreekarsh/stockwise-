@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Security & Login Logs — StockWise</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-logo"><a href="../index.html" style="text-decoration:none;color:inherit">Stock<span>Wise</span></a></div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="tracker.html">Live Tracker</a></li>
+      <li><a href="/signals">Signals</a></li>
+      <li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="community.html">Community</a></li>
+      <li><a href="avatar.html">✨ Avatar</a></li>
+      <li><a href="analyzer.html">Analyzer</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+    <div class="nav-badge">BETA</div>
+    <div class="nav-right" id="navRight"></div>
+  </nav>
+
+  <div class="page-wrap" style="max-width:900px">
+    <div class="page-header">
+      <h1>🔒 Account Security</h1>
+      <p>Monitor your account activity and login history</p>
+    </div>
+
+    <!-- Account Info Card -->
+    <div class="card" style="margin-bottom:1.75rem">
+      <div class="card-title">👤 Account Information</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+        <div>
+          <div style="font-size:0.78rem;color:var(--text2);margin-bottom:0.35rem;text-transform:uppercase;letter-spacing:0.5px">Username</div>
+          <div id="accUsername" style="font-size:1rem;font-weight:600">—</div>
+        </div>
+        <div>
+          <div style="font-size:0.78rem;color:var(--text2);margin-bottom:0.35rem;text-transform:uppercase;letter-spacing:0.5px">Email</div>
+          <div id="accEmail" style="font-size:1rem;font-weight:600">—</div>
+        </div>
+        <div>
+          <div style="font-size:0.78rem;color:var(--text2);margin-bottom:0.35rem;text-transform:uppercase;letter-spacing:0.5px">Account Created</div>
+          <div id="accCreated" style="font-size:1rem;font-weight:600">—</div>
+        </div>
+        <div>
+          <div style="font-size:0.78rem;color:var(--text2);margin-bottom:0.35rem;text-transform:uppercase;letter-spacing:0.5px">Total Logins</div>
+          <div id="accTotalLogins" style="font-size:1rem;font-weight:600">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login History -->
+    <div class="card">
+      <div class="card-title">📋 Login History</div>
+      <p style="color:var(--text2);font-size:0.9rem;margin-bottom:1rem">Last 50 login attempts and account activities</p>
+      <div style="overflow-x:auto">
+        <table class="data-table" id="logsTable" style="display:none">
+          <thead>
+            <tr>
+              <th>Date & Time</th>
+              <th>Type</th>
+              <th>IP Address</th>
+              <th>Device</th>
+            </tr>
+          </thead>
+          <tbody id="logsBody"></tbody>
+        </table>
+        <div id="logsLoader" class="loader"><div class="spinner"></div>Loading login history...</div>
+        <div id="emptyLogs" style="display:none;text-align:center;padding:2rem;color:var(--text2)">
+          <p>No login records found</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Tips -->
+    <div class="card" style="margin-top:1.75rem;background:rgba(0,229,160,0.05);border-color:rgba(0,229,160,0.2)">
+      <div class="card-title" style="color:var(--accent)">💡 Security Tips</div>
+      <ul style="list-style:none;padding:0;color:var(--text2);font-size:0.95rem;line-height:1.8">
+        <li style="margin-bottom:0.75rem"><strong>• Strong Password:</strong> Use a mix of uppercase, lowercase, numbers, and symbols</li>
+        <li style="margin-bottom:0.75rem"><strong>• Never Share Keys:</strong> Your API keys and secret tokens should remain private</li>
+        <li style="margin-bottom:0.75rem"><strong>• Monitor Logins:</strong> Review this page regularly to spot unusual activity</li>
+        <li style="margin-bottom:0.75rem"><strong>• Read-Only Access:</strong> Always use read-only API permissions when possible</li>
+        <li><strong>• Logout on Public WiFi:</strong> Always logout after accessing from public networks</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-logo">Stock<span>Wise</span></div>
+    <p>Your account security is our priority</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script>
+    async function init() {
+      const user = await waitForAuth();
+      if (!user) {
+        document.querySelector('.page-wrap').innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text2)"><p style="margin-bottom:1rem">Login to view your security settings</p><button class="btn-sm outline" onclick="openAuth(\'login\')">Login</button></div>';
+        return;
+      }
+      document.getElementById('accUsername').textContent = user.username;
+      document.getElementById('accEmail').textContent = user.email;
+      await loadLoginLogs();
+    }
+
+    async function waitForAuth() {
+      for (let i = 0; i < 20; i++) {
+        const u = window.stockwise?.currentUser();
+        if (u !== undefined) return u;
+        await new Promise(r => setTimeout(r, 100));
+      }
+      return null;
+    }
+
+    async function loadLoginLogs() {
+      try {
+        const res = await fetch('/api/login-logs', { credentials: 'include' });
+        if (!res.ok) throw new Error('Failed to load logs');
+        const logs = await res.json();
+        document.getElementById('logsLoader').style.display = 'none';
+        
+        if (!logs.length) {
+          document.getElementById('emptyLogs').style.display = 'block';
+          return;
+        }
+        
+        document.getElementById('accTotalLogins').textContent = logs.length;
+        
+        let rows = '';
+        logs.forEach(log => {
+          const date = new Date(log.login_at);
+          const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+          const deviceStr = extractBrowser(log.user_agent);
+          rows += `<tr>
+            <td>${dateStr}</td>
+            <td><span style="background:${log.login_type==='login'?'rgba(0,229,160,0.2)':'rgba(255,193,7,0.2)'};color:${log.login_type==='login'?'var(--accent)':'#ffc107'};padding:0.25rem 0.75rem;border-radius:6px;font-size:0.85rem;font-weight:600">${log.login_type}</span></td>
+            <td style="font-family:monospace;font-size:0.9rem;color:var(--text2)">${log.ip_address}</td>
+            <td style="font-size:0.9rem">${deviceStr}</td>
+          </tr>`;
+        });
+        document.getElementById('logsBody').innerHTML = rows;
+        document.getElementById('logsTable').style.display = 'table';
+      } catch (e) {
+        document.getElementById('logsLoader').innerHTML = `<span style="color:var(--red)">Error loading logs: ${e.message}</span>`;
+      }
+    }
+
+    function extractBrowser(ua) {
+      if (!ua) return 'Unknown';
+      if (ua.includes('Chrome')) return '🔵 Chrome';
+      if (ua.includes('Firefox')) return '🔴 Firefox';
+      if (ua.includes('Safari')) return '🟤 Safari';
+      if (ua.includes('Edge')) return '🟢 Edge';
+      if (ua.includes('Opera')) return '🔶 Opera';
+      return '🌐 Web Browser';
+    }
+
+    init();
+  </script>
+</body>
+</html>

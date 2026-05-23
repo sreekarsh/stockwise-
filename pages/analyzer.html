@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Portfolio Analyzer — StockWise</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-logo"><a href="../index.html" style="text-decoration:none;color:inherit">Stock<span>Wise</span></a></div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="tracker.html">Live Tracker</a></li>
+      <li><a href="/signals">Signals</a></li>
+      <li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="community.html">Community</a></li>
+      <li><a href="avatar.html">✨ Avatar</a></li>
+      <li><a href="analyzer.html" class="active">Analyzer</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+    <div class="nav-badge">BETA</div>
+    <div class="nav-right" id="navRight"></div>
+  </nav>
+
+  <div class="page-wrap">
+    <div class="page-header">
+      <h1>🔬 Portfolio Analyzer</h1>
+      <p>AI-powered analysis of your portfolio — risk, diversity, performance, and recommendations</p>
+    </div>
+
+    <div id="loginWall" style="display:none;text-align:center;padding:4rem 2rem">
+      <div style="font-size:3rem;margin-bottom:1rem">🔒</div>
+      <h2 style="font-family:'Syne',sans-serif;margin-bottom:0.75rem">Login to Analyze</h2>
+      <p style="color:var(--text2);margin-bottom:1.5rem">Add your portfolio first, then come here for a full AI analysis.</p>
+      <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
+        <button type="button" class="btn-sm outline" onclick="openAuth('login')">Login</button>
+        <button type="button" class="btn-sm primary" onclick="openAuth('register')">Create Account</button>
+      </div>
+    </div>
+
+    <div id="emptyWall" style="display:none;text-align:center;padding:4rem 2rem">
+      <div style="font-size:3rem;margin-bottom:1rem">💼</div>
+      <h2 style="font-family:'Syne',sans-serif;margin-bottom:0.75rem">No Portfolio Found</h2>
+      <p style="color:var(--text2);margin-bottom:1.5rem">Add holdings in the Portfolio page first</p>
+      <a href="portfolio.html" class="btn-sm primary">Go to Portfolio</a>
+    </div>
+
+    <div id="analyzerContent" style="display:none">
+      <!-- Score Cards -->
+      <div class="analyzer-grid" style="margin-bottom:1.5rem">
+        <div class="metric-card" style="grid-column:span 2">
+          <div class="metric-label">Overall Portfolio Score</div>
+          <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;margin-top:0.5rem">
+            <div class="metric-val" id="overallScore" style="font-size:3rem">—</div>
+            <div style="flex:1">
+              <div class="score-bar"><div class="score-fill" id="overallBar" style="width:0;background:var(--accent)"></div></div>
+              <div style="font-size:0.8rem;color:var(--text2);margin-top:0.4rem" id="overallLabel">Analyzing...</div>
+            </div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Diversification Score</div>
+          <div class="metric-val" id="divScore">—</div>
+          <div class="score-bar"><div class="score-fill" id="divBar" style="width:0;background:var(--accent2)"></div></div>
+          <div class="metric-sub" id="divLabel">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Risk Score</div>
+          <div class="metric-val" id="riskScore">—</div>
+          <div class="score-bar"><div class="score-fill" id="riskBar" style="width:0;background:var(--accent3)"></div></div>
+          <div class="metric-sub" id="riskLabel">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Total P&L</div>
+          <div class="metric-val" id="pnlVal">—</div>
+          <div class="metric-sub" id="pnlPct">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Best Performer</div>
+          <div class="metric-val" id="bestAsset" style="font-size:1.2rem">—</div>
+          <div class="metric-sub" id="bestReturn">—</div>
+        </div>
+      </div>
+
+      <!-- Allocation Chart (CSS) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem">
+        <div class="card">
+          <div class="card-title">📊 Allocation Breakdown</div>
+          <div id="allocationList"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">💡 AI Recommendations</div>
+          <div id="recommendations"></div>
+        </div>
+      </div>
+
+      <!-- Holdings table -->
+      <div class="card">
+        <div class="card-title">📋 Detailed Holdings Analysis</div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead><tr><th>Asset</th><th>Weight</th><th>Buy Price</th><th>Current</th><th>P&L</th><th>P&L %</th><th>Rating</th></tr></thead>
+            <tbody id="analyzerBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-logo">Stock<span>Wise</span></div>
+    <p>Portfolio analysis powered by real-time market data</p>
+  </footer>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-backdrop" id="authModal" onclick="if(event.target===this)closeAuth()">
+    <div class="modal">
+      <button class="modal-close" onclick="closeAuth()">×</button>
+      <h2>Welcome to <span style="color:var(--accent)">StockWise</span></h2>
+      <p class="modal-sub">Login or create an account to unlock all features</p>
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-tab="login" onclick="switchTab('login')">Login</button>
+        <button class="modal-tab" data-tab="register" onclick="switchTab('register')">Create Account</button>
+      </div>
+      <div id="loginForm">
+        <form onsubmit="doLogin(event)">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPass" placeholder="••••••••" required>
+          </div>
+          <div class="form-group" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.95rem">
+            <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.88rem;color:var(--text2)"><input type="checkbox" id="rememberLogin" onchange="toggleRemember(this)"> Remember me</label>
+            <button type="button" class="link-btn" onclick="openForgotPassword()" style="font-size:0.82rem">Forgot password?</button>
+          </div>
+          <button type="submit" class="btn-full">Login →</button>
+          <div class="auth-footer">Don't have an account? <button type="button" class="link-btn" onclick="switchTab('register')">Create account</button></div>
+        </form>
+      </div>
+      <div id="registerForm" style="display:none">
+        <form onsubmit="doRegister(event)">
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="regUsername" placeholder="traderpro123" required>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="regEmail" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="regPass" placeholder="Min 6 characters" minlength="6" required>
+          </div>
+          <div class="form-group remember-row">
+            <input type="checkbox" id="rememberRegister">
+            <label for="rememberRegister">Remember me</label>
+          </div>
+          <button type="submit" class="btn-full">Create Account →</button>
+          <div class="auth-footer">Already have an account? <button type="button" class="link-btn" onclick="switchTab('login')">Login</button></div>
+        </form>
+      </div>
+      <p class="error-msg" id="authError"></p>
+    </div>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script>
+    let portfolio = [];
+    let prices = {};
+
+    async function init() {
+      await new Promise(r => setTimeout(r, 350));
+      const user = window.stockwise?.currentUser();
+      if (!user) { document.getElementById('loginWall').style.display = 'block'; return; }
+      await loadData();
+    }
+
+    async function loadData() {
+      const [priceRes, portRes] = await Promise.all([
+        fetch('/api/markets?per_page=250&order=market_cap_desc', { credentials: 'include' }),
+        fetch('/api/portfolio', { credentials: 'include' })
+      ]);
+      const priceData = await priceRes.json();
+      priceData.forEach(c => { prices[c.symbol.toUpperCase()] = c.current_price; });
+      portfolio = await portRes.json();
+      if (!portfolio.length) { document.getElementById('emptyWall').style.display = 'block'; return; }
+      document.getElementById('analyzerContent').style.display = 'block';
+      analyze();
+    }
+
+    function analyze() {
+      // Compute per-asset
+      let totalValue = 0, totalInvested = 0;
+      const assets = portfolio.map(h => {
+        const cp = prices[h.symbol] || h.buy_price;
+        const value = h.quantity * cp;
+        const invested = h.quantity * h.buy_price;
+        const pnl = value - invested;
+        const pnlPct = invested > 0 ? (pnl / invested) * 100 : 0;
+        totalValue += value;
+        totalInvested += invested;
+        return { ...h, cp, value, invested, pnl, pnlPct };
+      });
+
+      const totalPnl = totalValue - totalInvested;
+      const totalPnlPct = totalInvested > 0 ? (totalPnl / totalInvested) * 100 : 0;
+
+      // Allocation %
+      assets.forEach(a => { a.weight = totalValue > 0 ? (a.value / totalValue) * 100 : 0; });
+
+      // Diversification score: penalize heavy concentration
+      const maxWeight = Math.max(...assets.map(a => a.weight));
+      const divScore = Math.max(0, Math.min(100, 100 - maxWeight + (assets.length * 5)));
+
+      // Risk score: based on concentration + crypto-only
+      const cryptoRatio = assets.filter(a => a.asset_type === 'crypto').length / assets.length;
+      const riskScore = Math.min(100, (maxWeight * 0.5) + (cryptoRatio * 30) + (assets.length < 3 ? 20 : 0));
+
+      // Performance score
+      const perfScore = Math.min(100, Math.max(0, 50 + totalPnlPct));
+
+      // Overall
+      const overallScore = Math.round((divScore * 0.35 + (100 - riskScore) * 0.35 + perfScore * 0.3));
+
+      // Best asset
+      const best = assets.sort((a,b) => b.pnlPct - a.pnlPct)[0];
+      assets.sort((a,b) => b.weight - a.weight); // re-sort by weight
+
+      // Render scores
+      animateScore('overallScore', overallScore, 'overall');
+      animateScore('divScore', Math.round(divScore), 'div');
+      animateScore('riskScore', Math.round(riskScore), 'risk');
+
+      setTimeout(() => {
+        document.getElementById('overallBar').style.width = overallScore + '%';
+        document.getElementById('divBar').style.width = divScore + '%';
+        document.getElementById('riskBar').style.width = riskScore + '%';
+        document.getElementById('overallLabel').textContent = getLabel(overallScore, 'overall');
+        document.getElementById('divLabel').textContent = getLabel(divScore, 'div');
+        document.getElementById('riskLabel').textContent = getLabel(riskScore, 'risk');
+      }, 200);
+
+      document.getElementById('pnlVal').textContent = (totalPnl >= 0 ? '+' : '') + '$' + fmtM(Math.abs(totalPnl));
+      document.getElementById('pnlVal').className = 'metric-val ' + (totalPnl >= 0 ? 'up' : 'down');
+      document.getElementById('pnlPct').textContent = (totalPnl >= 0 ? '+' : '') + totalPnlPct.toFixed(2) + '%';
+
+      document.getElementById('bestAsset').textContent = best.symbol;
+      document.getElementById('bestReturn').textContent = (best.pnlPct >= 0 ? '+' : '') + best.pnlPct.toFixed(2) + '% return';
+      document.getElementById('bestReturn').className = 'metric-sub ' + (best.pnlPct >= 0 ? 'up' : 'down');
+
+      // Allocation bars
+      const alloc = document.getElementById('allocationList');
+      const colors = ['var(--accent)','var(--accent2)','var(--yellow)','var(--accent3)','#b388ff','#80cbc4'];
+      alloc.innerHTML = assets.map((a,i) => `
+        <div style="margin-bottom:0.85rem">
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;font-size:0.84rem">
+            <span style="font-weight:600">${a.symbol}</span>
+            <span style="color:var(--text2)">${a.weight.toFixed(1)}%  ·  $${fmtM(a.value)}</span>
+          </div>
+          <div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
+            <div style="width:${a.weight}%;height:100%;background:${colors[i%colors.length]};border-radius:3px;transition:width 1s ease"></div>
+          </div>
+        </div>
+      `).join('');
+
+      // Recommendations
+      const recs = [];
+      if (maxWeight > 60) recs.push({ icon: '⚠️', text: `${assets[0].symbol} makes up ${assets[0].weight.toFixed(0)}% of your portfolio. Consider diversifying to reduce concentration risk.` });
+      if (assets.length < 5) recs.push({ icon: '📊', text: `You hold ${assets.length} assets. Diversifying to 5–10 different assets can reduce volatility.` });
+      if (cryptoRatio === 1) recs.push({ icon: '💡', text: 'Your portfolio is 100% crypto. Adding some stocks or stablecoins can hedge against crypto market downturns.' });
+      if (totalPnlPct < -20) recs.push({ icon: '📉', text: 'Portfolio is down significantly. Review your positions and consider whether a DCA strategy might help reduce average cost.' });
+      if (totalPnlPct > 50) recs.push({ icon: '🎯', text: 'Great performance! Consider taking some profits and rebalancing to lock in gains.' });
+      if (assets.length >= 5 && maxWeight < 40) recs.push({ icon: '✅', text: 'Your portfolio is well-diversified. Keep monitoring and rebalance quarterly.' });
+      if (!recs.length) recs.push({ icon: '✅', text: 'Your portfolio looks balanced! Continue monitoring market signals for opportunities.' });
+
+      document.getElementById('recommendations').innerHTML = recs.map(r => `
+        <div style="display:flex;gap:0.65rem;margin-bottom:1rem;font-size:0.87rem;line-height:1.55">
+          <span style="flex-shrink:0">${r.icon}</span>
+          <span style="color:var(--text2)">${r.text}</span>
+        </div>
+      `).join('');
+
+      // Holdings table
+      document.getElementById('analyzerBody').innerHTML = assets.map(a => {
+        const rating = a.pnlPct > 20 ? '🔥 Strong' : a.pnlPct > 5 ? '✅ Good' : a.pnlPct > -5 ? '😐 Flat' : a.pnlPct > -20 ? '⚠️ Weak' : '🔴 Poor';
+        return `<tr>
+          <td><strong>${a.symbol}</strong><br><span style="font-size:0.75rem;color:var(--text2)">${a.name}</span></td>
+          <td>${a.weight.toFixed(1)}%</td>
+          <td>$${fmtP(a.buy_price)}</td>
+          <td>$${fmtP(a.cp)}</td>
+          <td class="${a.pnl>=0?'up':'down'}">${a.pnl>=0?'+':''}$${fmtM(Math.abs(a.pnl))}</td>
+          <td class="${a.pnlPct>=0?'up':'down'}">${a.pnlPct>=0?'+':''}${a.pnlPct.toFixed(2)}%</td>
+          <td style="font-size:0.82rem">${rating}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function animateScore(id, target, type) {
+      const el = document.getElementById(id);
+      let val = 0;
+      const timer = setInterval(() => {
+        val = Math.min(val + 2, target);
+        el.textContent = val + '/100';
+        if (val >= target) clearInterval(timer);
+      }, 20);
+    }
+
+    function getLabel(score, type) {
+      if (type === 'risk') {
+        if (score < 25) return 'Low Risk — Conservative';
+        if (score < 50) return 'Moderate Risk';
+        if (score < 75) return 'High Risk — Aggressive';
+        return 'Very High Risk';
+      }
+      if (score >= 80) return 'Excellent';
+      if (score >= 60) return 'Good';
+      if (score >= 40) return 'Average — Room to improve';
+      return 'Poor — Needs attention';
+    }
+
+    function fmtP(p) {
+      if (!p) return '0';
+      if (p >= 1000) return p.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+      if (p >= 1) return p.toFixed(4);
+      return p.toFixed(6);
+    }
+    function fmtM(n) {
+      if (!n) return '0.00';
+      if (n >= 1e9) return (n/1e9).toFixed(2) + 'B';
+      if (n >= 1e6) return (n/1e6).toFixed(2) + 'M';
+      if (n >= 1e3) return (n/1e3).toFixed(2) + 'K';
+      return n.toFixed(2);
+    }
+
+    init();
+  </script>
+</body>
+</html>

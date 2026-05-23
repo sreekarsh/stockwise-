@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Avatar Studio — StockWise</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* ============================================
+       ROBLOX AVATAR STUDIO — IMPROVED CSS
+       ============================================ */
+
+    /* Main two-column layout */
+    .avatar-studio-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 320px;
+      gap: 2rem;
+      align-items: start;
+      margin-top: 1.5rem;
+    }
+
+    /* Live Preview Card */
+    .preview-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2rem 1.75rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    .preview-label {
+      font-family: 'Syne', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-size: 0.65rem;
+      color: var(--text2);
+      margin-bottom: 1.25rem;
+      font-weight: 700;
+    }
+
+    #avatarPreview {
+      width: 180px;
+      height: 220px;
+      margin: 0 auto 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: #0a0f1a;
+      border-radius: 18px;
+      border: 2px solid var(--border);
+      box-shadow: 
+        0 10px 30px rgba(0,0,0,0.5),
+        inset 0 0 0 1px rgba(255,255,255,0.06);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #avatarPreview:hover {
+      transform: scale(1.02);
+      box-shadow: 
+        0 15px 45px rgba(0, 229, 160, 0.15),
+        inset 0 0 0 1px rgba(255,255,255,0.1);
+    }
+
+    #avatarPreview svg {
+      width: 92%;
+      height: 92%;
+      max-width: 160px;
+      max-height: 200px;
+      display: block;
+    }
+
+    #avatarNamePreview {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.75rem;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+      letter-spacing: -0.5px;
+    }
+
+    #avatarSubPreview {
+      color: var(--text2);
+      font-size: 0.85rem;
+    }
+
+    /* Controls Column */
+    .controls-column {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    /* Section Cards — polished */
+    .section-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.15rem 1.3rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .section-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 8px 25px rgba(0, 229, 160, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--text);
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: 0.3px;
+    }
+
+    /* Character Preset Tiles — Roblox style */
+    #presetGrid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+    }
+
+    #presetGrid button {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.7rem;
+      padding: 9px 4px;
+      border-radius: 10px;
+      background: var(--bg3);
+      border: 2px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+      line-height: 1.1;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    #presetGrid button:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 229, 160, 0.2);
+    }
+
+    #presetGrid button:active {
+      transform: scale(0.97);
+    }
+
+    /* Face Expression Tiles */
+    #faceGrid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+    }
+
+    #faceGrid button {
+      font-size: 1.5rem;
+      padding: 10px 6px;
+      border-radius: 12px;
+      background: var(--bg3);
+      border: 2px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    #faceGrid button:hover {
+      border-color: var(--accent);
+      transform: scale(1.08);
+    }
+
+    #faceGrid button[style*="accent"] {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 229, 160, 0.2);
+    }
+
+    /* Color swatches */
+    #colorGrid button {
+      height: 36px;
+      border-radius: 10px;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+
+    #colorGrid button:hover {
+      transform: scale(1.1);
+    }
+
+    /* Other grids (texture, accessory, energy, bg) */
+    #textureGrid button,
+    #accessoryGrid button,
+    #energyGrid button,
+    #bgGrid button {
+      transition: all 0.15s ease;
+      font-weight: 600;
+    }
+
+    #textureGrid button:hover,
+    #accessoryGrid button:hover,
+    #energyGrid button:hover,
+    #bgGrid button:hover {
+      border-color: var(--accent) !important;
+      transform: translateY(-1px);
+    }
+
+    /* Input polish */
+    #avName {
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    #avName:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 229, 160, 0.15);
+      outline: none;
+    }
+
+    /* Save button area */
+    .save-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-logo"><a href="../index.html" style="text-decoration:none;color:inherit">Stock<span>Wise</span></a></div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="tracker.html">Live Tracker</a></li>
+      <li><a href="/signals">Signals</a></li>
+      <li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="community.html">Community</a></li>
+      <li><a href="avatar.html" class="active">✨ Avatar</a></li>
+      <li><a href="analyzer.html">Analyzer</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+    <div class="nav-badge">BETA</div>
+    <div class="nav-right" id="navRight"></div>
+  </nav>
+
+  <div class="page-wrap">
+    <div class="page-header">
+      <h1>✨ Roblox Avatar Studio</h1>
+      <p>Create your own blocky Roblox-style character. Choose from presets, pick faces, colors, hats & glows. Your avatar shows everywhere in StockWise.</p>
+    </div>
+
+    <div class="avatar-studio-grid">
+ 
+      <!-- ─── LIVE PREVIEW ─── -->
+      <div class="preview-card">
+        <div id="previewBg" style="position:absolute;inset:0;background:radial-gradient(ellipse at center,#111520 0%,#0a0e17 100%);border-radius:20px;z-index:0;transition:background 0.6s"></div>
+        <div style="position:relative;z-index:1">
+          <div class="preview-label">Live Preview — Roblox Style</div>
+          <div id="avatarPreview">
+            <!-- Roblox character injected here by JS -->
+          </div>
+          <div id="avatarNamePreview" style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.6rem;color:var(--text);margin-bottom:0.35rem">Anonymous</div>
+          <div id="avatarSubPreview" style="color:var(--text2);font-size:0.85rem">Your personal brand in StockWise</div>
+        </div>
+      </div>
+
+      <!-- ─── CONTROLS ─── -->
+      <div class="controls-column">
+
+        <!-- Display Name -->
+        <div class="section-card">
+          <div class="section-title">🏷 Display Name</div>
+          <input id="avName" type="text" placeholder="Enter your avatar name" maxlength="36"
+            style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:0.6rem 0.9rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;width:100%"
+            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+          <p style="color:var(--text2);font-size:0.78rem;margin-top:0.45rem">This name appears on your avatar badge throughout the app.</p>
+        </div>
+
+        <!-- Roblox Character Presets -->
+        <div class="section-card">
+          <div class="section-title">👾 Quick Roblox Characters</div>
+          <div id="presetGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px"></div>
+          <p style="color:var(--text2);font-size:0.72rem;margin-top:0.4rem">Click any to instantly load a cool Roblox-style look</p>
+        </div>
+
+        <!-- Face Styles -->
+        <div class="section-card">
+          <div class="section-title">😊 Face Expression</div>
+          <div id="faceGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px"></div>
+        </div>
+
+        <!-- Avatar Color -->
+        <div class="section-card">
+          <div class="section-title">🎨 Avatar Color</div>
+          <div id="colorGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:0.5rem"></div>
+          <div style="margin-top:0.65rem;display:flex;align-items:center;gap:0.5rem">
+            <span style="font-size:0.78rem;color:var(--text2)">Custom:</span>
+            <input id="avColorCustom" type="color" value="#00e5a0"
+              style="width:36px;height:28px;border:none;background:none;cursor:pointer" onchange="applyCustomColor()">
+            <span id="avColorHex" style="font-size:0.78rem;color:var(--text2);font-family:monospace">#00e5a0</span>
+          </div>
+        </div>
+
+        <!-- Texture -->
+        <div class="section-card">
+          <div class="section-title">🔢 Texture</div>
+          <div id="textureGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.45rem"></div>
+        </div>
+
+        <!-- Accessory -->
+        <div class="section-card">
+          <div class="section-title">👑 Accessory / Dress</div>
+          <div id="accessoryGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:0.5rem"></div>
+        </div>
+
+        <!-- Energy Glow -->
+        <div class="section-card">
+          <div class="section-title">⚡ Energy Glow</div>
+          <div id="energyGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:0.5rem"></div>
+        </div>
+
+        <!-- Background -->
+        <div class="section-card">
+          <div class="section-title">🌌 Preview Background</div>
+          <div id="bgGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:0.5rem"></div>
+        </div>
+
+        <!-- Save -->
+        <div class="save-actions">
+          <button class="btn-full" onclick="saveAvatar()">💾 Save Avatar</button>
+          <button class="btn-sm outline" onclick="resetAvatar()">Reset</button>
+        </div>
+        <p id="saveMsg" style="text-align:center;font-size:0.82rem;display:none"></p>
+
+      </div><!-- end controls -->
+    </div><!-- end grid -->
+  </div><!-- end page-wrap -->
+
+  <!-- AUTH MODAL -->
+  <div class="modal-backdrop" id="authModal" onclick="if(event.target===this)closeAuth()">
+    <div class="modal">
+      <button class="modal-close" onclick="closeAuth()">×</button>
+      <h2>Welcome to <span style="color:var(--accent)">StockWise</span></h2>
+      <p class="modal-sub">Create your avatar before you start.</p>
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-tab="login" onclick="switchTabModal('login')">Login</button>
+        <button class="modal-tab" data-tab="register" onclick="switchTabModal('register')">Create Account</button>
+      </div>
+      <div id="loginForm">
+        <form onsubmit="doLogin(event)">
+          <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="you@example.com" required></div>
+          <div class="form-group"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••" required></div>
+          <div class="form-group" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.95rem">
+            <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.88rem;color:var(--text2)"><input type="checkbox" id="rememberLogin" onchange="toggleRemember(this)"> Remember me</label>
+            <button type="button" class="link-btn" onclick="openForgotPassword()" style="font-size:0.82rem">Forgot password?</button>
+          </div>
+          <button type="submit" class="btn-full">Login →</button>
+          <div class="auth-footer">Don't have an account? <button type="button" class="link-btn" onclick="switchTabModal('register')">Create account</button></div>
+        </form>
+      </div>
+      <div id="registerForm" style="display:none">
+        <form onsubmit="doRegister(event)">
+          <div class="form-group"><label>Username</label><input type="text" id="regUsername" placeholder="traderpro123" required></div>
+          <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="you@example.com" required></div>
+          <div class="form-group"><label>Password</label><input type="password" id="regPass" placeholder="Min 6 characters" minlength="6" required></div>
+          <div class="form-group remember-row"><input type="checkbox" id="rememberRegister"><label for="rememberRegister">Remember me</label></div>
+          <button type="submit" class="btn-full">Create Account →</button>
+          <div class="auth-footer">Already have an account? <button type="button" class="link-btn" onclick="switchTabModal('login')">Login</button></div>
+        </form>
+      </div>
+      <p class="error-msg" id="authError"></p>
+    </div>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script>
+    /* ═══════════════════════════════════════
+       HELPERS
+    ═══════════════════════════════════════ */
+    let _avatar = {
+      name: '', bg_color: '#00e5a0', texture: 'solid',
+      accessory: 'none', energy: 'none', background: 'deep'
+    };
+
+    function escHtml(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    /* ═══════════════════════════════════════
+       LOAD CURRENT AVATAR + PRESETS
+    ═══════════════════════════════════════ */
+    async function init() {
+      const user = window.stockwise?.currentUser();
+      if (!user) { openAuth('login'); return; }
+
+      // Load user's avatar
+      if (user.avatar) {
+        _avatar = { face: 'happy', ..._avatar, ...user.avatar };
+      } else {
+        _avatar.face = 'happy';
+      }
+
+      try {
+        const res  = await fetch('/api/avatar', { credentials: 'include' });
+        const data = await res.json();
+        if (data.bg_color) _avatar = { ..._avatar, ...data };
+      } catch {}
+
+      // Load presets
+      try {
+        const res  = await fetch('/api/avatar-presets', { credentials: 'include' });
+        const p    = await res.json();
+        buildColorGrid(p.colors  || []);
+        buildTextureGrid(p.textures    || []);
+        buildAccessoryGrid(p.accessories || []);
+        buildEnergyGrid(p.energies     || []);
+        buildBgGrid(p.backgrounds     || []);
+        buildPresetGrid();
+        buildFaceGrid();
+        applyAll();
+      } catch { toast('Could not load avatar presets', 'error'); }
+    }
+
+    /* ═══════════════════════════════════════
+       BUILD PICKER GRIDS
+    ═══════════════════════════════════════ */
+    function buildColorGrid(colors) {
+      document.getElementById('colorGrid').innerHTML = colors.map(c => `
+        <button onclick="pickColor('${c.id}','${c.hex}','${escHtml(c.name)}')"
+          title="${escHtml(c.name)}"
+          style="width:100%;height:34px;border-radius:10px;background:${c.hex};border:3px solid ${_avatar.bg_color===c.hex?'#fff':'transparent'};cursor:pointer;transition:border-color 0.15s,transform 0.15s"
+          onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform=''"></button>`
+      ).join('');
+    }
+
+    function buildTextureGrid(textures) {
+      document.getElementById('textureGrid').innerHTML = textures.map(t => `
+        <button onclick="pickTexture('${t.id}','${escHtml(t.name)}')"
+          style="padding:0.55rem;border-radius:10px;background:var(--bg3);border:2px solid ${_avatar.texture===t.id ? 'var(--accent)' : 'var(--border)'};color:var(--text);font-size:0.8rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:border-color 0.15s"
+          onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor='${_avatar.texture===t.id?'var(--accent)':'var(--border)'}'">${escHtml(t.name)}</button>`
+      ).join('');
+    }
+
+    function buildAccessoryGrid(accs) {
+      document.getElementById('accessoryGrid').innerHTML = accs.map(a => `
+        <button onclick="pickAccessory('${a.id}','${escHtml(a.label)}','${a.emoji}')"
+          style="height:54px;border-radius:10px;background:var(--bg3);border:2px solid ${_avatar.accessory===a.id ? 'var(--accent)' : 'var(--border)'};font-size:1.3rem;cursor:pointer;transition:border-color 0.15s"
+          title="${escHtml(a.label)}"
+          onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor='${_avatar.accessory===a.id?'var(--accent)':'var(--border)'}'">${a.emoji || '—'}</button>`
+      ).join('');
+    }
+
+    function buildEnergyGrid(energies) {
+      document.getElementById('energyGrid').innerHTML = energies.map(e => `
+        <button onclick="pickEnergy('${e.id}','${escHtml(e.name)}','${e.glow}')"
+          style="padding:0.5rem 0.75rem;border-radius:10px;background:var(--bg3);border:2px solid ${_avatar.energy===e.id ? 'var(--accent)' : 'var(--border)'};color:var(--text);font-size:0.8rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:border-color 0.15s;text-align:center"
+          onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor='${_avatar.energy===e.id?'var(--accent)':'var(--border)'}'">${escHtml(e.name)}</button>`
+      ).join('');
+    }
+
+    function buildBgGrid(bgs) {
+      document.getElementById('bgGrid').innerHTML = bgs.map(b => `
+        <button onclick="pickBg('${b.id}','${b.gradient.replace(/'/g,"\\'")}')"
+          style="height:48px;border-radius:10px;background:${b.gradient};border:2px solid ${_avatar.background===b.id ? 'var(--accent)' : 'var(--border)'};font-size:0.75rem;color:rgba(255,255,255,0.8);cursor:pointer;transition:border-color 0.15s"
+          title="${escHtml(b.name)}"
+          onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor='${_avatar.background===b.id?'var(--accent)':'var(--border)'}'">${escHtml(b.name)}</button>`
+      ).join('');
+    }
+
+    /* ═══════════════════════════════════════
+       PICKER HANDLERS
+    ═══════════════════════════════════════ */
+    function pickColor(id, hex, name) {
+      _avatar.bg_color = hex;
+      document.getElementById('avColorCustom').value = hex;
+      document.getElementById('avColorHex').textContent = hex;
+      refreshColorGrid(id);
+      applyAll();
+    }
+    function applyCustomColor() {
+      const hex = document.getElementById('avColorCustom').value;
+      _avatar.bg_color = hex;
+      document.getElementById('avColorHex').textContent = hex;
+      refreshColorGrid(null);
+      applyAll();
+    }
+    function pickTexture(id, name) { _avatar.texture = id; refreshTextureGrid(); applyAll(); }
+    function pickAccessory(id, label, emoji) { _avatar.accessory = id; refreshAccessoryGrid(); applyAll(); }
+    function pickEnergy(id, name, glow) { _avatar.energy = id; refreshEnergyGrid(); applyAll(); }
+    function pickBg(id, gradient) { _avatar.background = id; applyAll(); }
+
+    // Roblox quick presets
+    const ROBLOX_PRESETS = [
+      { name: 'Noob',       color: '#f0d0a0', accessory: 'none',    face: 'happy' },
+      { name: 'Cool Kid',   color: '#00bfff', accessory: 'cap',     face: 'cool' },
+      { name: 'King',       color: '#ffd700', accessory: 'crown',   face: 'grin' },
+      { name: 'Ninja',      color: '#1a1a2e', accessory: 'headband',face: 'serious' },
+      { name: 'Rich',       color: '#00e5a0', accessory: 'emerald', face: 'wink' },
+      { name: 'Cute',       color: '#ff69b4', accessory: 'bow',     face: 'happy' },
+      { name: 'Skater',     color: '#ff6b6b', accessory: 'cap',     face: 'wink' },
+      { name: 'Wizard',     color: '#7b68ee', accessory: 'halo',    face: 'serious' },
+    ];
+
+    function buildPresetGrid() {
+      const container = document.getElementById('presetGrid');
+      if (!container) return;
+      container.innerHTML = ROBLOX_PRESETS.map((p, i) => `
+        <button onclick="loadRobloxPreset(${i})"
+          style="padding:6px 4px;border-radius:8px;background:var(--bg3);border:2px solid var(--border);font-size:0.7rem;color:var(--text);cursor:pointer;transition:all .15s;text-align:center;line-height:1.1">
+          ${p.name}
+        </button>
+      `).join('');
+    }
+
+    function loadRobloxPreset(index) {
+      const p = ROBLOX_PRESETS[index];
+      _avatar.bg_color = p.color;
+      _avatar.accessory = p.accessory;
+      _avatar.face = p.face || 'happy';
+      document.getElementById('avColorCustom').value = p.color;
+      document.getElementById('avColorHex').textContent = p.color;
+      applyAll();
+      refreshAccessoryGrid();
+      refreshFaceGrid();
+    }
+
+    // Face options
+    const FACE_OPTIONS = ['happy', 'cool', 'wink', 'serious', 'grin'];
+
+    function buildFaceGrid() {
+      const container = document.getElementById('faceGrid');
+      if (!container) return;
+      container.innerHTML = FACE_OPTIONS.map(f => `
+        <button onclick="pickFace('${f}')"
+          style="padding:8px;border-radius:10px;background:var(--bg3);border:2px solid ${_avatar.face===f ? 'var(--accent)' : 'var(--border)'};font-size:1.4rem;cursor:pointer;transition:all .15s"
+          title="${f}">
+          ${f === 'happy' ? '😊' : f === 'cool' ? '😎' : f === 'wink' ? '😉' : f === 'serious' ? '😐' : '😄'}
+        </button>
+      `).join('');
+    }
+
+    function pickFace(face) {
+      _avatar.face = face;
+      refreshFaceGrid();
+      applyAll();
+    }
+
+    function refreshFaceGrid() {
+      const container = document.getElementById('faceGrid');
+      if (!container) return;
+      container.querySelectorAll('button').forEach((btn, i) => {
+        const f = FACE_OPTIONS[i];
+        btn.style.borderColor = (_avatar.face === f) ? 'var(--accent)' : 'var(--border)';
+        btn.style.transform = (_avatar.face === f) ? 'scale(1.05)' : 'scale(1)';
+      });
+    }
+
+    function refreshColorGrid(activeId) {
+      document.querySelectorAll('#colorGrid button').forEach(b => b.style.borderColor = 'transparent');
+      if (activeId) document.querySelector(`#colorGrid button[onclick*="'${activeId}'"]`)?.style.setProperty('border-color', '#fff');
+    }
+    function refreshTextureGrid() {
+      document.querySelectorAll('#textureGrid button').forEach(b =>
+        b.style.borderColor = b.getAttribute('onclick')?.includes(`'${_avatar.texture}'`) ? 'var(--accent)' : 'var(--border)'
+      );
+    }
+    function refreshAccessoryGrid() {
+      document.querySelectorAll('#accessoryGrid button').forEach(b =>
+        b.style.borderColor = b.getAttribute('onclick')?.includes(`'${_avatar.accessory}'`) ? 'var(--accent)' : 'var(--border)'
+      );
+    }
+    function refreshEnergyGrid() {
+      document.querySelectorAll('#energyGrid button').forEach(b =>
+        b.style.borderColor = b.getAttribute('onclick')?.includes(`'${_avatar.energy}'`) ? 'var(--accent)' : 'var(--border)'
+      );
+    }
+    function refreshBgGrid() {
+      document.querySelectorAll('#bgGrid button').forEach(b =>
+        b.style.borderColor = b.getAttribute('onclick')?.includes(`'${_avatar.background}'`) ? 'var(--accent)' : 'var(--border)'
+      );
+    }
+
+    /* ═══════════════════════════════════════
+       LIVE PREVIEW
+    ═══════════════════════════════════════ */
+    const PRESETS = {
+      deep:    'radial-gradient(ellipse at center,#1a1a2e 0%,#0d0d1a 100%)',
+      ocean:   'radial-gradient(ellipse at bottom,#0f2027 0%,#203a43 50%,#2c5364 100%)',
+      sunset:  'radial-gradient(ellipse at top,#1a0a2e,#3d1a00)',
+      forest:  'radial-gradient(ellipse at bottom,#0d1f0d 0%,#0a1a0a 100%)',
+      aurora:  'radial-gradient(ellipse at top,#0d1a2e 0%,#0a0f1e 100%)',
+    };
+    const GLOW_PRESETS = {
+      none:  'none',
+      neon:  '0 0 18px var(--avatar-color)',
+      glow:  '0 0 30px var(--avatar-color),0 0 60px var(--avatar-color)',
+      fire:  '0 0 22px #ff6b35,0 0 44px #ff4757',
+      ice:   '0 0 22px #00bfff,0 0 44px #1e90ff',
+    };
+    const ACCESSORY_MAP = {
+      'none':    '',      'crown': '👑',  'halo':    '✨',
+      'headband':'🎧',   'glasses':'🕶️', 'cap':     '🧢',
+      'bow':     '🎀',   'emerald':'💎',
+    };
+
+    //-derived BG gradients
+    const TEXTURE_CSS = {
+      solid:    'linear-gradient(135deg, VAR, VAR)',
+      radial:   'radial-gradient(circle, VAR 40%, transparent 70%)',
+      diagonal: 'repeating-linear-gradient(45deg, VAR 8px, VAR 16px)',
+      stripes:  'repeating-linear-gradient(90deg, VAR, VAR 5px, transparent 5px, transparent 10px)',
+      dots:     'radial-gradient(circle, VAR 2px, transparent 2px) 0 0 / 9px 9px, transparent',
+    };
+
+    function applyAll() {
+      const color   = _avatar.bg_color || '#00e5a0';
+      const texture = _avatar.texture || 'solid';
+      const acc     = ACCESSORY_MAP[_avatar.accessory] || '';
+
+      // Name field
+      document.getElementById('avName').value = _avatar.name || '';
+      document.getElementById('avatarSubPreview').textContent = acc ? acc + '  StockWise member' : 'StockWise member';
+
+      // Full Roblox character preview
+      const avatar = document.getElementById('avatarPreview');
+      avatar.innerHTML = window.auSvg ? window.auSvg(_avatar.name, _avatar) : '';
+      avatar.style.boxShadow = GLOW_PRESETS[_avatar.energy] || '0 10px 30px rgba(0,0,0,0.4)';
+
+      // Name preview
+      document.getElementById('avatarNamePreview').textContent = _avatar.name || (window.stockwise?.currentUser()?.username || 'Anonymous');
+
+      // Page BG
+      const pageBg = document.getElementById('previewBg');
+      pageBg.style.background = PRESETS[_avatar.background] || PRESETS.deep;
+    }
+
+    /* ═══════════════════════════════════════
+       SAVE
+    ═══════════════════════════════════════ */
+    async function saveAvatar() {
+      _avatar.name = document.getElementById('avName').value.trim();
+      try {
+        const res = await fetch('/api/avatar', {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name:       _avatar.name,
+            bg_color:   _avatar.bg_color,
+            texture:    _avatar.texture,
+            accessory:  _avatar.accessory,
+            energy:     _avatar.energy,
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          toast('Avatar saved!', 'success');
+          if (window.stockwise?.makeAuthFresh) window.stockwise.makeAuthFresh();
+        } else {
+          toast(data.error || 'Could not save', 'error');
+        }
+      } catch { toast('Network error', 'error'); }
+    }
+
+    // Reset to defaults
+    function resetAvatar() {
+      _avatar = { name: '', bg_color: '#00e5a0', texture: 'solid', accessory: 'none', energy: 'none', background: 'deep' };
+      applyAll();
+      document.getElementById('avColorCustom').value = '#00e5a0';
+      document.getElementById('avColorHex').textContent = '#00e5a0';
+    }
+
+    /* ═══════════════════════════════════════
+       AUTH HELPERS
+    ═══════════════════════════════════════ */
+    function openAuth(tab) { document.getElementById('authModal').classList.add('open'); switchTabModal(tab); }
+    function closeAuth()  { document.getElementById('authModal').classList.remove('open'); }
+    function switchTabModal(tab) {
+      document.querySelectorAll('#authModal .modal-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+      document.getElementById('loginForm').style.display    = tab === 'login'    ? 'block' : 'none';
+      document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+      document.getElementById('authError').textContent = '';
+    }
+
+    // Navigation hooks from main.js
+    async function doLogin(e) {
+      e.preventDefault();
+      const res = await fetch('/api/login', {method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('loginEmail').value,password:document.getElementById('loginPass').value})});
+      const d = await res.json();
+      if (d.error) { document.getElementById('authError').textContent = d.error; return; }
+      closeAuth();
+      await window.stockwise?.makeAuthFresh?.();
+      toast('Welcome back!', 'success');
+      init();
+    }
+    async function doRegister(e) {
+      e.preventDefault();
+      const res = await fetch('/api/register', {method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:document.getElementById('regUsername').value,email:document.getElementById('regEmail').value,password:document.getElementById('regPass').value})});
+      const d = await res.json();
+      if (d.error) { document.getElementById('authError').textContent = d.error; return; }
+      closeAuth();
+      await window.stockwise?.makeAuthFresh?.();
+      toast('Account created!', 'success');
+      init();
+    }
+
+    // Wait for auth to be ready, then init
+    function waitForAuth() {
+      if (window.stockwiseAuthReady) {
+        init();
+        initGuideBot();
+      } else {
+        setTimeout(waitForAuth, 100);
+      }
+    }
+    waitForAuth();
+  </script>
+</body>
+</html>

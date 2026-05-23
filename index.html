@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StockWise — Smart Market Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="nav-logo">Stock<span>Wise</span></div>
+<ul class="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="pages/tracker.html">Live Tracker</a></li>
+    <li><a href="/signals" id="nav-signals">Signals</a></li>
+    <li><a href="pages/portfolio.html">Portfolio</a></li>
+    <li><a href="pages/community.html">Community</a></li>
+    <li><a href="pages/avatar.html">✨ Avatar</a></li>
+    <li><a href="pages/analyzer.html">Analyzer</a></li>
+    <li><a href="pages/profile.html">Profile</a></li>
+  </ul>
+    <div class="nav-badge">BETA</div>
+    <div class="nav-right" id="navRight"></div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag">BY: SREE KARSH</div>
+    <h1 class="hero-title">
+      Trade Smarter<br>
+      <span class="accent">With AI Signals</span>
+    </h1>
+    <p class="hero-sub">Real-time stock & crypto prices, technical analysis, ML-powered signals, portfolio sync with CoinDCX, and community trends — all in one place.</p>
+    <div class="hero-btns">
+      <a href="pages/tracker.html" class="btn-primary">View Live Prices →</a>
+      <a href="/signals" class="btn-outline">See Signals</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num" id="s1">0</span><span class="stat-label">Assets Tracked</span></div>
+      <div class="stat-div"></div>
+      <div class="stat"><span class="stat-num" id="s2">0</span><span class="stat-label">Signals Today</span></div>
+      <div class="stat-div"></div>
+      <div class="stat"><span class="stat-num" id="s3">0</span><span class="stat-label">% Accuracy</span></div>
+    </div>
+    <div class="ticker-wrap">
+      <div class="ticker-track" id="tickerTrack"></div>
+    </div>
+    <div class="pro-price-demo" id="coingeckoProDemo">
+      <div class="pro-price-title">CoinGecko Pro Live Demo</div>
+      <div class="pro-price-grid" id="proPriceGrid">
+        <div class="pro-price-cell">Loading live prices...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <p class="section-tag">What We Offer</p>
+    <h2 class="section-title">Everything You Need<br>To Analyze Markets</h2>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">📈</div>
+        <h3>Live Price Tracker</h3>
+        <p>Real-time prices for 50+ stocks and 20+ cryptocurrencies. Auto-refreshing every 30 seconds.</p>
+        <a href="pages/tracker.html" class="feat-link">Open Tracker →</a>
+      </div>
+      <div class="feat-card feat-card--accent">
+        <div class="feat-icon">🤖</div>
+        <h3>AI Buy/Sell Signals</h3>
+        <p>Our ML model combines RSI, MACD, Bollinger Bands and news sentiment to generate clear signals.</p>
+        <a href="/signals" class="feat-link">View Signals →</a>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">💼</div>
+        <h3>Portfolio + CoinDCX Sync</h3>
+        <p>Add your holdings manually or sync directly from your CoinDCX account using your API key.</p>
+        <a href="pages/portfolio.html" class="feat-link">Track Portfolio →</a>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔬</div>
+        <h3>Portfolio Analyzer</h3>
+        <p>AI-powered analysis of your portfolio — diversity score, risk rating, P&L, and improvement tips.</p>
+        <a href="pages/analyzer.html" class="feat-link">Analyze Now →</a>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🌐</div>
+        <h3>Community Trends</h3>
+        <p>See what coins traders are talking about, share your views, and follow sentiment in real-time.</p>
+        <a href="pages/community.html" class="feat-link">Join Community →</a>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📰</div>
+        <h3>Live Crypto News</h3>
+        <p>Aggregated news from CryptoPanic + CoinGecko with bullish/bearish sentiment labels.</p>
+        <a href="pages/community.html#news" class="feat-link">Read News →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how">
+    <p class="section-tag">Under The Hood</p>
+    <h2 class="section-title">How StockWise Works</h2>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-num">01</div>
+        <h4>Fetch Live Data</h4>
+        <p>Prices are pulled from CoinGecko API (crypto) and Yahoo Finance (stocks) every 30 seconds.</p>
+      </div>
+      <div class="how-arrow">→</div>
+      <div class="how-step">
+        <div class="step-num">02</div>
+        <h4>Calculate Indicators</h4>
+        <p>RSI, MACD, and Bollinger Bands are computed on historical price data automatically.</p>
+      </div>
+      <div class="how-arrow">→</div>
+      <div class="how-step">
+        <div class="step-num">03</div>
+        <h4>Generate Signal</h4>
+        <p>Our rule engine + ML model combines all signals to give a clear Buy / Hold / Sell recommendation.</p>
+      </div>
+      <div class="how-arrow">→</div>
+      <div class="how-step">
+        <div class="step-num">04</div>
+        <h4>Analyze & Profit</h4>
+        <p>Sync your CoinDCX portfolio, run AI analysis, join the community, and set price alerts.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-logo">Stock<span>Wise</span></div>
+    <p> Built with ❤️ using HTML, CSS, JS, Node.js & CoinGecko API</p>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="pages/tracker.html">Tracker</a>
+      <a href="/signals">Signals</a>
+      <a href="pages/portfolio.html">Portfolio</a>
+      <a href="pages/community.html">Community</a>
+      <a href="pages/analyzer.html">Analyzer</a>
+    </div>
+  </footer>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-backdrop" id="authModal" onclick="if(event.target===this)closeAuth()">
+    <div class="modal">
+      <button class="modal-close" onclick="closeAuth()">×</button>
+      <h2>Welcome to <span style="color:var(--accent)">StockWise</span></h2>
+      <p class="modal-sub">Login or create an account to unlock all features</p>
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-tab="login" onclick="switchTab('login')">Login</button>
+        <button class="modal-tab" data-tab="register" onclick="switchTab('register')">Create Account</button>
+      </div>
+      <!-- Login -->
+      <div id="loginForm">
+        <form onsubmit="doLogin(event)">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPass" placeholder="••••••••" required>
+          </div>
+          <div class="form-group" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.95rem">
+            <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.88rem;color:var(--text2)"><input type="checkbox" id="rememberLogin" onchange="toggleRemember(this)"> Remember me</label>
+            <button type="button" class="link-btn" onclick="openForgotPassword()" style="font-size:0.82rem">Forgot password?</button>
+          </div>
+          <button type="submit" class="btn-full">Login →</button>
+          <div class="auth-footer">Don't have an account? <button type="button" class="link-btn" onclick="switchTab('register')">Create account</button></div>
+        </form>
+      </div>
+      <!-- Register -->
+      <div id="registerForm" style="display:none">
+        <form onsubmit="doRegister(event)">
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="regUsername" placeholder="traderpro123" required>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="regEmail" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="regPass" placeholder="Min 6 characters" minlength="6" required>
+          </div>
+          <div class="form-group remember-row">
+            <input type="checkbox" id="rememberRegister">
+            <label for="rememberRegister">Remember me</label>
+          </div>
+          <button type="submit" class="btn-full">Create Account →</button>
+          <div class="auth-footer">Already have an account? <button type="button" class="link-btn" onclick="switchTab('login')">Login</button></div>
+        </form>
+      </div>
+      <p class="error-msg" id="authError"></p>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

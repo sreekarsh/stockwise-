@@ -1,0 +1,20 @@
+{
+  "version": "2",
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@railway/node"
+    },
+    {
+      "src": "ml_engine/server.py",
+      "use": "@railway/python"
+    }
+  ],
+  "deploy": {
+    "startCommand": "node server.js",
+    "healthcheckPath": "/api/markets?per_page=1",
+    "healthcheckTimeout": 30,
+    "restartPolicyType": "on_failure",
+    "restartPolicyMaxRetries": 3
+  }
+}

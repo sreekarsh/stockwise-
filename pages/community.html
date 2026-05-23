@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Community — StockWise Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  
+  <style>
+    /* ══════════════════════════════════════════════
+       DISCORD PRO ENGINE - ARCHITECTURE & DESIGN SYSTEM
+       ══════════════════════════════════════════════ */
+    :root {
+      --discord-bg: #0b0f17;
+      --discord-sidebar: #070a10;
+      --discord-server-bar: #05070a;
+      --discord-right-sidebar: #080c14;
+      --discord-card: #121824;
+      --discord-card-hover: #1a2233;
+      --discord-accent: #00e5a0;
+      --discord-accent-dim: rgba(0, 229, 160, 0.1);
+      --discord-text-muted: #8fa0b5;
+      --discord-voice-green: #23a55a;
+      --discord-danger: #f23f43;
+      --discord-border: rgba(255, 255, 255, 0.06);
+      --discord-input: #05070a;
+    }
+
+    body.community-page {
+      background-color: var(--discord-bg);
+      font-family: 'DM Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: #fff;
+    }
+
+    /* Navbar Fixes */
+    .navbar {
+      z-index: 1001;
+      position: relative;
+    }
+
+    /* System Layout Wrapper */
+    .discord-app-container {
+      display: grid;
+      grid-template-columns: 72px 240px 1fr 340px;
+      flex: 1;
+      background: var(--discord-bg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (max-width: 1400px) {
+      .discord-app-container { grid-template-columns: 72px 240px 1fr; }
+      .discord-sidebar-right { display: none; }
+    }
+    @media (max-width: 900px) {
+      .discord-app-container { grid-template-columns: 72px 1fr; }
+      .discord-sidebar-left { display: none; }
+    }
+
+    /* ── SERVER BAR (FAR LEFT) ── */
+    .discord-server-sidebar {
+      background: var(--discord-server-bar);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 0;
+      gap: 12px;
+      border-right: 1px solid rgba(0,0,0,0.2);
+      z-index: 10;
+      overflow-y: auto;
+    }
+
+    .server-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--discord-card);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      color: var(--discord-text-muted);
+      font-size: 1.1rem;
+      font-weight: 700;
+      position: relative;
+    }
+    .server-icon:hover, .server-icon.active {
+      border-radius: 16px;
+      background: var(--discord-accent);
+      color: #000;
+    }
+    .server-icon.active::before {
+      content: ''; position: absolute; left: -12px; width: 4px; height: 32px; background: #fff; border-radius: 0 4px 4px 0;
+    }
+
+    .server-separator {
+      width: 32px; height: 2px; background: var(--discord-border); margin: 4px 0;
+    }
+
+    /* ── LEFT SIDEBAR (CHANNELS) ── */
+    .discord-sidebar-left {
+      background: var(--discord-sidebar);
+      border-right: 1px solid var(--discord-border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      padding: 0 1rem;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      font-weight: 800;
+      font-family: 'Syne', sans-serif;
+      border-bottom: 1px solid var(--discord-border);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-scrollable {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 0.5rem;
+    }
+
+    .sidebar-category {
+      margin-bottom: 1.5rem;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--discord-text-muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 0 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .category-btn {
+      background: none; border: none; color: var(--discord-text-muted); cursor: pointer; font-size: 1.1rem; transition: color 0.1s;
+    }
+    .category-btn:hover { color: #fff; }
+
+    .d-channel-item {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--discord-text-muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      margin-bottom: 2px;
+      transition: all 0.1s;
+    }
+    .d-channel-item:hover, .d-channel-item.active {
+      background: var(--discord-card-hover);
+      color: #fff;
+    }
+    .d-channel-item.active {
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .channel-hash {
+      margin-right: 6px; font-size: 1.2rem; opacity: 0.5; font-weight: 400;
+    }
+
+    /* User Panel (Bottom) */
+    .user-status-panel {
+      background: rgba(0,0,0,0.2);
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-top: 1px solid var(--discord-border);
+    }
+    .user-avatar-small {
+      width: 32px; height: 32px; border-radius: 50%; background: #313338; position: relative;
+    }
+    .user-status-dot {
+      position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--discord-sidebar); background: var(--discord-voice-green);
+    }
+    .user-info-text { flex: 1; min-width: 0; }
+    .u-name { font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .u-tag { font-size: 0.72rem; color: var(--discord-text-muted); }
+    .user-actions { display: flex; gap: 4px; }
+    .u-btn { background: none; border: none; color: var(--discord-text-muted); cursor: pointer; padding: 4px; border-radius: 4px; font-size: 1rem; }
+    .u-btn:hover { background: var(--discord-card-hover); color: #fff; }
+
+    /* ── CENTER FEED ── */
+    .discord-feed {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: var(--discord-bg);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .d-feed-header {
+      height: 48px;
+      padding: 0 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--discord-border);
+      background: rgba(11, 15, 23, 0.7);
+      backdrop-filter: blur(12px);
+      z-index: 5;
+    }
+    .d-feed-header h2 {
+      margin: 0; font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px;
+    }
+
+    .d-messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      scroll-behavior: smooth;
+    }
+
+    /* Message Styles */
+    .d-msg {
+      display: flex; gap: 1rem; position: relative; padding: 4px 0;
+    }
+    .d-msg:hover { background: rgba(255, 255, 255, 0.01); }
+    .d-msg-avatar {
+      width: 40px; height: 40px; border-radius: 50%; background: #313338; flex-shrink: 0; overflow: hidden;
+    }
+    .d-msg-body { flex: 1; min-width: 0; }
+    .d-msg-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+    .d-msg-author { font-weight: 600; color: #fff; font-size: 0.95rem; cursor: pointer; }
+    .d-msg-author:hover { text-decoration: underline; }
+    .d-msg-time { font-size: 0.72rem; color: var(--discord-text-muted); font-weight: 400; }
+    .d-msg-content { color: #dbdee1; font-size: 0.95rem; line-height: 1.4; word-break: break-word; }
+    .post-coin { background: var(--discord-accent-dim); color: var(--discord-accent); padding: 1px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; margin-left: 8px; }
+
+    /* Composer */
+    .d-composer-wrap {
+      padding: 0 1rem 1.5rem;
+    }
+    .d-composer-box {
+      background: var(--discord-card);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      position: relative;
+    }
+    .composer-textarea {
+      width: 100%; background: transparent; border: none; resize: none; outline: none; color: #dbdee1; font-family: inherit; font-size: 0.95rem; min-height: 44px; max-height: 50vh; padding-right: 40px;
+    }
+    .composer-actions-bar {
+      display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .composer-tools-left { display: flex; align-items: center; gap: 12px; }
+    .composer-tool-btn { background: none; border: none; color: var(--discord-text-muted); cursor: pointer; font-size: 1.2rem; transition: color 0.1s; display: flex; align-items: center; gap: 4px; }
+    .composer-tool-btn:hover { color: #dbdee1; }
+
+    /* ── RIGHT SIDEBAR (INSIGHTS) ── */
+    .discord-sidebar-right {
+      background: var(--discord-right-sidebar);
+      border-left: 1px solid var(--discord-border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+    .right-sidebar-header {
+      height: 48px; padding: 0 1rem; display: flex; align-items: center; font-weight: 700; border-bottom: 1px solid var(--discord-border); color: #fff; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .right-panel-content {
+      flex: 1; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 1.5rem;
+    }
+    .insights-card {
+      background: var(--discord-card); border: 1px solid var(--discord-border); border-radius: 8px; padding: 1rem;
+    }
+    .insights-title {
+      font-size: 0.72rem; font-weight: 800; text-transform: uppercase; color: var(--discord-text-muted); margin-bottom: 1rem; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;
+    }
+    
+    .coin-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .coin-icon { width: 24px; height: 24px; border-radius: 50%; background: #2b2d31; }
+    .coin-tag-name { font-size: 0.88rem; color: #fff; font-weight: 600; flex: 1; }
+    .coin-pct-pill { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+    .coin-pct-pill.up { background: rgba(35, 165, 90, 0.1); color: #23a55a; }
+    .coin-pct-pill.down { background: rgba(242, 63, 67, 0.1); color: #f23f43; }
+
+    .pulse-meter { height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; margin-bottom: 8px; position: relative; overflow: hidden; }
+    .pulse-fill { height: 100%; background: var(--discord-accent); transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); width: 50%; }
+
+    /* Sticker Picker */
+    .sticker-picker-wrap {
+      position: absolute; bottom: 80px; left: 1rem; z-index: 1000; background: var(--discord-card); border: 1px solid var(--discord-accent); border-radius: 12px; padding: 12px; width: 300px; max-height: 400px; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    }
+    .sticker-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .sticker-item { background: none; border: none; font-size: 1.8rem; cursor: pointer; padding: 4px; border-radius: 8px; transition: transform 0.1s; }
+    .sticker-item:hover { transform: scale(1.2); background: rgba(255,255,255,0.05); }
+
+    .engine-input {
+      background: var(--discord-input); border: 1px solid var(--discord-border); color: #fff; padding: 0.5rem; border-radius: 6px; width: 100%; outline: none; font-size: 0.85rem;
+    }
+    .engine-input:focus { border-color: var(--discord-accent); }
+
+    .spinner { width: 24px; height: 24px; border: 3px solid rgba(0, 229, 160, 0.1); border-top-color: var(--discord-accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader { display: flex; align-items: center; justify-content: center; padding: 1rem; }
+  </style>
+</head>
+
+<body class="community-page">
+  <nav class="navbar">
+    <div class="nav-logo"><a href="../index.html" style="text-decoration:none;color:inherit">Stock<span>Wise</span></a></div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="tracker.html">Live Tracker</a></li>
+      <li><a href="/signals">Signals</a></li>
+      <li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="community.html" class="active">Community</a></li>
+      <li><a href="avatar.html">✨ Avatar</a></li>
+      <li><a href="analyzer.html">Analyzer</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+    <div class="nav-badge">BETA</div>
+    <div class="nav-right" id="navRight"></div>
+  </nav>
+
+  <div class="discord-app-container">
+
+    <!-- ── SERVER BAR (FAR LEFT) ── -->
+    <aside class="discord-server-sidebar">
+      <div class="server-icon active" title="StockWise Hub" onclick="switchCategory('hub', this)">SW</div>
+      <div class="server-separator"></div>
+      <div class="server-icon" title="Crypto Markets" onclick="switchCategory('crypto', this)">₿</div>
+      <div class="server-icon" title="Stock Insights" onclick="switchCategory('stocks', this)">📈</div>
+      <div class="server-icon" title="Alpha Signals" onclick="switchCategory('alpha', this)">⚡</div>
+      <div class="server-separator"></div>
+      <div class="server-icon" title="Add Server" style="color:var(--discord-voice-green)" onclick="window.stockwise?.toast('Server creation module initializing soon.', 'info')">＋</div>
+    </aside>
+
+    <!-- ── LEFT SIDEBAR (CHANNELS) ── -->
+    <aside class="discord-sidebar-left">
+      <header class="sidebar-header" id="sidebarHubTitle">
+        StockWise Hub
+      </header>
+      
+      <div class="sidebar-scrollable">
+        <div class="sidebar-category">
+          <div class="category-header">
+            <span>💬 Channels</span>
+            <button class="category-btn" onclick="openCreateGroup()">＋</button>
+          </div>
+          <div class="channel-list-items" id="groupsList">
+            <a href="#" class="d-channel-item active" onclick="setActiveGroup(null, this)">
+                <span class="channel-hash">#</span> global-feed
+            </a>
+            <!-- Groups dynamic list -->
+          </div>
+        </div>
+
+        <div class="sidebar-category">
+          <div class="category-header">
+            <span>🎤 Voice Channels</span>
+          </div>
+          <div class="channel-list-items">
+            <div class="d-channel-item" onclick="joinVoice('Trader Lounge')">
+              <span style="display:inline-block;width:8px;height:8px;background:var(--discord-voice-green);border-radius:50%;margin-right:8px;box-shadow:0 0 8px var(--discord-voice-green)"></span>
+              Trader Lounge
+            </div>
+            <div class="d-channel-item" onclick="joinVoice('Alpha Room')">
+              <span style="display:inline-block;width:8px;height:8px;background:var(--discord-text-muted);border-radius:50%;margin-right:8px;"></span>
+              Alpha Room
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Panel -->
+      <div class="user-status-panel">
+        <div class="user-avatar-small" id="userPanelAvatar">
+          <div class="user-status-dot"></div>
+        </div>
+        <div class="user-info-text">
+          <div class="u-name" id="userPanelName">Trader</div>
+          <div class="u-tag">#0001</div>
+        </div>
+        <div class="user-actions">
+          <button class="u-btn" title="Mute">🎤</button>
+          <button class="u-btn" title="Deafen">🎧</button>
+          <button class="u-btn" onclick="location.href='profile.html'" title="Settings">⚙️</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── CENTER FEED ── -->
+    <main class="discord-feed">
+      <header class="d-feed-header">
+        <h2>
+          <span class="channel-hash">#</span>
+          <span id="currentChannelName">global-feed</span>
+        </h2>
+        <div style="display:flex;gap:16px;align-items:center">
+          <span id="currentChannelMembers" style="font-size:0.8rem;color:var(--discord-text-muted)"></span>
+          <button class="u-btn" onclick="loadPosts()" title="Refresh Feed">↻</button>
+        </div>
+      </header>
+
+      <div class="d-messages-container" id="postsFeed">
+        <!-- Messages dynamic list -->
+        <div class="loader"><div class="spinner"></div></div>
+      </div>
+
+      <!-- Composer -->
+      <div class="d-composer-wrap">
+        <div id="composerBlock" style="display:none" class="d-composer-box">
+          <textarea id="postContent" 
+                    class="composer-textarea" 
+                    placeholder="Message #global-feed"
+                    oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';updateCharCount()"
+                    onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); submitPost(); }"></textarea>
+          
+          <div class="composer-actions-bar">
+            <div class="composer-tools-left">
+              <button class="composer-tool-btn" onclick="toggleStickerPicker()">😊 <span style="font-size:0.75rem">Stickers</span></button>
+              <select id="postCoin" class="engine-input" style="width:auto;padding:2px 8px;font-size:0.75rem;background:var(--discord-sidebar)">
+                <option value="">🔗 Tag Coin</option>
+                <option>BTC</option><option>ETH</option><option>SOL</option>
+                <option>BNB</option><option>XRP</option><option>DOGE</option>
+              </select>
+              <span id="charCount" style="font-size:0.75rem;color:var(--discord-text-muted)">0 / 500</span>
+            </div>
+            <button class="btn-sm primary" onclick="submitPost()" style="padding:0.4rem 1.2rem;font-weight:700">Send</button>
+          </div>
+
+          <!-- Sticker picker -->
+          <div id="stickerPicker" class="sticker-picker-wrap" style="display:none">
+            <div style="font-size:0.7rem;color:var(--discord-accent);font-weight:800;text-transform:uppercase;margin-bottom:8px;position:sticky;top:0;background:var(--discord-card);padding-bottom:4px;z-index:1">Quick Expression Matrix</div>
+            <div id="stickerGrid" class="sticker-grid"></div>
+          </div>
+        </div>
+
+        <div id="loginPrompt" style="display:none;padding:1.5rem;text-align:center;background:var(--discord-card);border-radius:8px;border:1px solid var(--discord-border)">
+          <p style="color:var(--discord-text-muted);margin-bottom:1rem;font-size:0.9rem">Authentication required to bridge message streams.</p>
+          <button class="btn-sm primary" onclick="openAuth('login')" style="padding:0.5rem 2rem">Sync Session</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- ── RIGHT SIDEBAR (INSIGHTS) ── -->
+    <aside class="discord-sidebar-right">
+      <header class="right-sidebar-header">
+        Insights Engine
+      </header>
+
+      <div class="right-panel-content">
+        <div class="insights-card">
+          <div class="insights-title">🌍 Global Market</div>
+          <div id="globalMarket" style="font-size:0.85rem;color:#fff">
+            <div class="loader"><div class="spinner"></div></div>
+          </div>
+        </div>
+
+        <div class="insights-card">
+          <div class="insights-title">
+            <span>🔥 Community Pulse</span>
+            <span id="pulseStatus" style="color:var(--discord-accent)">Bullish</span>
+          </div>
+          <div class="pulse-meter">
+            <div class="pulse-fill"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--discord-text-muted)">
+            <span>65% Bullish</span>
+            <span>35% Bearish</span>
+          </div>
+        </div>
+
+        <div class="insights-card">
+          <div class="insights-title">🚀 Trending</div>
+          <div id="trendingList"></div>
+        </div>
+
+        <div class="insights-card">
+          <div class="insights-title">📈 Top Gainers</div>
+          <div id="gainersList"></div>
+        </div>
+
+        <div class="insights-card">
+          <div class="insights-title">📉 Top Losers</div>
+          <div id="losersList"></div>
+        </div>
+
+        <div class="insights-card">
+          <div class="insights-title">
+            <span>📰 Market News</span>
+            <span style="font-size:0.6rem;background:var(--discord-danger);color:#fff;padding:1px 4px;border-radius:3px;animation:pulse 2s infinite">LIVE</span>
+          </div>
+          <div id="newsLoader" class="loader"><div class="spinner"></div></div>
+          <div id="newsGrid" style="display:flex; flex-direction:column; gap:0.5rem;"></div>
+        </div>
+
+        <div class="insights-card">
+          <div class="insights-title">😰 Fear & Greed</div>
+          <div id="fearGreed"></div>
+        </div>
+
+        <div class="insights-card" style="margin-top:auto;background:rgba(0,0,0,0.15)">
+          <div class="insights-title" style="margin-bottom:8px">🔑 API Pipeline</div>
+          <div style="display:flex;flex-direction:column;gap:0.5rem">
+            <input type="password" id="newsApiKey" class="engine-input" placeholder="CryptoCompare API Key">
+            <input type="password" id="communityApiKey" class="engine-input" placeholder="Chat Matrix Key">
+            <button class="btn-sm primary" style="width:100%" onclick="saveCommunityKeys()">Save Pipeline Keys</button>
+            <p id="keySaveMsg" style="font-size:0.7rem;text-align:center;margin-top:4px"></p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-backdrop" id="authModal" onclick="if(event.target===this)closeAuth()">
+    <div class="modal" style="background:var(--discord-card); border:1px solid var(--discord-border); padding:2rem; border-radius:14px;">
+      <button class="modal-close" onclick="closeAuth()">×</button>
+      <h2 style="margin-top:0">Welcome to <span style="color:var(--discord-accent)">StockWise</span></h2>
+      <p style="color:var(--discord-text-muted); font-size:0.85rem; margin-bottom:1.5rem">Join the conversation — login to post and react.</p>
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-tab="login" onclick="switchTabModal('login')">Login</button>
+        <button class="modal-tab" data-tab="register" onclick="switchTabModal('register')">Create Account</button>
+      </div>
+      <div id="loginForm">
+        <form onsubmit="doLogin(event)">
+          <div class="form-group"><label>Email</label><input type="email" id="loginEmail" required class="engine-input"></div>
+          <div class="form-group"><label>Password</label><input type="password" id="loginPass" required class="engine-input"></div>
+          <button type="submit" class="btn-full primary-action" style="background:var(--discord-accent);color:#000;border:none;padding:0.75rem;border-radius:8px;font-weight:700;width:100%;cursor:pointer">Login →</button>
+        </form>
+      </div>
+      <div id="registerForm" style="display:none">
+        <form onsubmit="doRegister(event)">
+          <div class="form-group"><label>Username</label><input type="text" id="regUsername" required class="engine-input"></div>
+          <div class="form-group"><label>Email</label><input type="email" id="regEmail" required class="engine-input"></div>
+          <div class="form-group"><label>Password</label><input type="password" id="regPass" required class="engine-input"></div>
+          <button type="submit" class="btn-full primary-action" style="background:var(--discord-accent);color:#000;border:none;padding:0.75rem;border-radius:8px;font-weight:700;width:100%;cursor:pointer">Create Account →</button>
+        </form>
+      </div>
+      <p class="error-msg" id="authError" style="color:var(--discord-danger);font-size:0.8rem;margin-top:1rem"></p>
+    </div>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script>
+    let activeGroupId = null; 
+    let editingPostId  = null;
+
+    const STICKERS = [
+        '📈','📉','💎','🙌','🚀','🌙','🔥','⚡','💪','🤑','😎','🤝','👀','🦁','🍕','☕','📊','🔔','💰','🧠','👑','🍀','🎯','🛸','👽','👻','🤖','💯','✨','💥','❤️','🌈','🌊','🍔','🍦','🎮','🎲','🎸','🎹','🏆','🥇','🥈','🥉','🏅','🎖️','🎫','🎟️','🎭','🎨','🎬','🎤','🎧','🎼','🎷','🎺','🎻','🥁','✅','❌','⚠️','⭕','🛑','🟢','🔴','🟡','🔵','🟣','⚪','⚫','🟤'
+    ];
+
+    async function init() {
+      const user = window.stockwise?.currentUser();
+      if (user) {
+        document.getElementById('userPanelName').textContent = user.username || 'Trader';
+        if (window.auSvg) {
+          const a = user.avatar || {};
+          document.getElementById('userPanelAvatar').innerHTML = window.auSvg(user.username || 'U', {
+            bg_color: a.bg_color || '#00e5a0', accessory: a.accessory || 'none', energy: a.energy || 'none', showLegs: false
+          }) + '<div class="user-status-dot"></div>';
+        }
+        document.getElementById('composerBlock').style.display = 'block';
+        document.getElementById('loginPrompt').style.display  = 'none';
+        loadCommunityKeys();
+      } else {
+        document.getElementById('composerBlock').style.display = 'none';
+        document.getElementById('loginPrompt').style.display  = 'block';
+      }
+      loadPosts(); loadGroups(); loadTrending(); loadGainersLosers('crypto'); loadFearGreed(); loadNews(); buildStickerGrid();
+    }
+
+    function waitForAuth() { if (window.stockwiseAuthReady) { init(); return; } setTimeout(waitForAuth, 100); }
+    waitForAuth();
+
+    function switchCategory(cat, el) {
+      if (!el) return;
+      document.querySelectorAll('.server-icon').forEach(i => i.classList.remove('active'));
+      el.classList.add('active');
+      const hubTitle = document.getElementById('sidebarHubTitle');
+      if (cat === 'crypto') { hubTitle.textContent = 'Crypto Hub'; loadGainersLosers('crypto'); loadNews('cryptocurrency bitcoin ethereum'); }
+      else if (cat === 'stocks') { hubTitle.textContent = 'Equity Hub'; loadGainersLosers('stocks'); loadNews('stock market trading wallstreet'); }
+      else if (cat === 'alpha') { hubTitle.textContent = 'Alpha Signals'; loadGainersLosers('crypto'); loadNews('crypto signals trading alerts'); }
+      else { hubTitle.textContent = 'StockWise Hub'; loadGainersLosers('crypto'); loadNews('financial markets investing'); }
+      loadTrending(); loadPosts();
+    }
+
+    function setActiveGroup(id, el) {
+        activeGroupId = id;
+        document.querySelectorAll('.d-channel-item').forEach(i => i.classList.remove('active'));
+        if (el) el.classList.add('active');
+        document.getElementById('currentChannelName').textContent = el ? el.textContent.trim().replace('# ','') : 'global-feed';
+        loadPosts();
+    }
+
+    function joinVoice(name) {
+      if (!window.stockwise?.currentUser()) { openAuth('login'); return; }
+      window.stockwise?.toast(`Connecting to ${name} stream...`, 'success');
+    }
+
+    async function loadPosts() {
+      const feed = document.getElementById('postsFeed');
+      try {
+        const url = activeGroupId ? `/api/community?group_id=${activeGroupId}` : '/api/community';
+        const res = await fetch(url, { credentials: 'include' });
+        const posts = await res.json();
+        const me = window.stockwise?.currentUser();
+        const auSvgFn = window.auSvg || (s=>s);
+        
+        if (!posts.length) {
+          feed.innerHTML = `<div style="text-align:center;padding:4rem;color:var(--discord-text-muted)"><div style="font-size:3rem;margin-bottom:1rem;opacity:0.2">💬</div><p>No transmissions detected in this node.</p></div>`;
+          return;
+        }
+        
+        feed.innerHTML = posts.map(p => `
+          <div class="d-msg">
+            <div class="d-msg-avatar">${auSvgFn(p.username, {bg_color: p.avatar_bg_color, accessory: p.avatar_accessory, energy: p.avatar_energy, showLegs:false})}</div>
+            <div class="d-msg-body">
+              <div class="d-msg-header">
+                <span class="d-msg-author">${escHtml(p.username)}</span>
+                <span class="d-msg-time">${timeAgo(p.created_at)}</span>
+                ${p.coin ? `<span class="post-coin">${p.coin}</span>` : ''}
+              </div>
+              <div class="d-msg-content">${escHtml(p.content)}</div>
+            </div>
+          </div>
+        `).join('');
+        feed.scrollTop = feed.scrollHeight;
+      } catch (err) { feed.innerHTML = '<p style="color:var(--discord-danger);text-align:center;padding:2rem">Feed connection lost.</p>'; }
+    }
+
+    async function submitPost() {
+      const content = document.getElementById('postContent').value.trim();
+      const coin = document.getElementById('postCoin').value;
+      if (!content) return;
+      try {
+        const res = await fetch('/api/community', {
+          method: 'POST', credentials: 'include', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ content, coin, group_id: activeGroupId })
+        });
+        if (res.ok) { document.getElementById('postContent').value = ''; updateCharCount(); loadPosts(); }
+      } catch (err) { window.stockwise?.toast('Message failed to deploy.', 'error'); }
+    }
+
+    async function loadGroups() {
+      try {
+        const res = await fetch('/api/groups', { credentials: 'include' });
+        const groups = await res.json();
+        const list = document.getElementById('groupsList');
+        const existingGlobal = `<a href="#" class="d-channel-item ${!activeGroupId ? 'active' : ''}" onclick="setActiveGroup(null, this)"><span class="channel-hash">#</span> global-feed</a>`;
+        list.innerHTML = existingGlobal + groups.map(g => `
+          <a href="#" class="d-channel-item ${activeGroupId === g.id ? 'active' : ''}" onclick="setActiveGroup(${g.id}, this)">
+            <span class="channel-hash">#</span> ${escHtml(g.name)}
+          </a>
+        `).join('');
+      } catch {}
+    }
+
+    async function loadGainersLosers(category) {
+      const gList = document.getElementById('gainersList');
+      const lList = document.getElementById('losersList');
+      try {
+        let stocks = [];
+        if (category === 'crypto') {
+            const res = await fetch(`/api/markets?vs_currency=usd&per_page=50`, { credentials: 'include' });
+            stocks = await res.json();
+        } else {
+            const res = await fetch(`/api/stocks?category=${category}`);
+            stocks = await res.json();
+        }
+        
+        const sorted = [...stocks].filter(s => s.price_change_percentage_24h).sort((a,b) => b.price_change_percentage_24h - a.price_change_percentage_24h);
+        const gainers = sorted.slice(0, 5);
+        const losers = [...sorted].reverse().slice(0, 5);
+
+        const renderRow = s => `
+          <div class="coin-row">
+            <img src="${s.image}" class="coin-icon" onerror="this.src='https://cdn-icons-png.flaticon.com/512/25/25228.png'">
+            <span class="coin-tag-name">${s.symbol.toUpperCase()}</span>
+            <span class="coin-pct-pill ${s.price_change_percentage_24h >= 0 ? 'up' : 'down'}">${s.price_change_percentage_24h >= 0 ? '▲' : '▼'} ${Math.abs(s.price_change_percentage_24h).toFixed(1)}%</span>
+          </div>`;
+        
+        gList.innerHTML = gainers.length ? gainers.map(renderRow).join('') : '<p style="font-size:0.7rem;color:var(--discord-text-muted)">Scanning market...</p>';
+        lList.innerHTML = losers.length ? losers.map(renderRow).join('') : '<p style="font-size:0.7rem;color:var(--discord-text-muted)">Scanning market...</p>';
+      } catch { gList.innerHTML = 'Offline'; lList.innerHTML = 'Offline'; }
+    }
+
+    async function loadNews(q = 'cryptocurrency') {
+      const grid = document.getElementById('newsGrid');
+      const loader = document.getElementById('newsLoader');
+      try {
+        const res = await fetch(`/api/news?q=${encodeURIComponent(q)}`, { credentials: 'include' });
+        const data = await res.json();
+        const articles = data.results || [];
+        grid.innerHTML = articles.slice(0, 5).map(a => `
+          <a href="${a.url}" target="_blank" style="text-decoration:none;display:block;margin-bottom:8px">
+            <div style="font-size:0.65rem;color:var(--discord-accent);text-transform:uppercase">${a.source.title}</div>
+            <div style="font-size:0.8rem;color:#fff;font-weight:500;line-height:1.2">${escHtml(a.title)}</div>
+          </a>`).join('');
+        loader.style.display = 'none';
+      } catch { loader.innerHTML = 'News module offline'; }
+    }
+
+    async function loadFearGreed() {
+      const el = document.getElementById('fearGreed');
+      const gMarket = document.getElementById('globalMarket');
+      try {
+        const res = await fetch('/api/market-trends', { credentials: 'include' });
+        const data = await res.json();
+        const fg = data.fearGreed || { value: 50, value_classification: 'Neutral' };
+        const val = parseInt(fg.value);
+        
+        el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:1.2rem;font-weight:800;color:${val > 50 ? 'var(--discord-accent)' : 'var(--discord-danger)'}">${val}</span>
+          <span style="font-size:0.8rem;color:var(--discord-text-muted)">${fg.value_classification}</span>
+        </div>`;
+
+        const pulseFill = document.querySelector('.pulse-fill');
+        const pulseStatus = document.getElementById('pulseStatus');
+        if (pulseFill) pulseFill.style.width = `${val}%`;
+        if (pulseStatus) {
+            pulseStatus.textContent = fg.value_classification;
+            pulseStatus.style.color = val > 50 ? 'var(--discord-accent)' : 'var(--discord-danger)';
+        }
+
+        if (data.global) {
+          const mChg = data.global.market_cap_change_percentage_24h_usd || 0;
+          gMarket.innerHTML = `
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>Cap Change</span><span style="color:${mChg >= 0 ? 'var(--discord-accent)' : 'var(--discord-danger)'}">${mChg >= 0 ? '+' : ''}${mChg.toFixed(1)}%</span></div>
+            <div style="display:flex;justify-content:space-between"><span>Dominance</span><span>BTC: ${data.global.market_cap_percentage?.btc?.toFixed(1) || 0}%</span></div>`;
+        }
+      } catch {}
+    }
+
+    function buildStickerGrid() {
+      document.getElementById('stickerGrid').innerHTML = STICKERS.map(s => 
+        `<button class="sticker-item" onclick="addSticker('${s}')">${s}</button>`
+      ).join('');
+    }
+    function toggleStickerPicker() { const p = document.getElementById('stickerPicker'); p.style.display = p.style.display === 'none' ? 'block' : 'none'; }
+    function addSticker(s) { const ta = document.getElementById('postContent'); ta.value += s; toggleStickerPicker(); ta.focus(); updateCharCount(); }
+    function updateCharCount() { document.getElementById('charCount').textContent = `${document.getElementById('postContent').value.length} / 500`; }
+    function timeAgo(d) {
+      const s = Math.floor((new Date() - new Date(d)) / 1000);
+      if (s < 60) return 'just now';
+      if (s < 3600) return Math.floor(s/60) + 'm ago';
+      if (s < 86400) return Math.floor(s/3600) + 'h ago';
+      return Math.floor(s/84600) + 'd ago';
+    }
+    function escHtml(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    async function loadCommunityKeys() { try { const u = window.stockwise?.currentUser(); if (u) { document.getElementById('newsApiKey').value = u.news_api_key || ''; document.getElementById('communityApiKey').value = u.community_api_key || ''; } } catch {} }
+    async function saveCommunityKeys() {
+        const news_api_key = document.getElementById('newsApiKey').value.trim();
+        const community_api_key = document.getElementById('communityApiKey').value.trim();
+        const res = await fetch('/api/api-keys', {
+            method: 'POST', credentials: 'include', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ news_api_key, community_api_key })
+        });
+        if (res.ok) { window.stockwise?.toast('Keys saved!', 'success'); loadNews(); }
+    }
+  </script>
+</body>
+</html>

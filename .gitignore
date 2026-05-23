@@ -1,0 +1,15 @@
+node_modules/
+stockwise.db
+*.log
+.env
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+error.log
+server*.log
+start.bat
+start_ml.bat
+.git
+.github
+.vscode
