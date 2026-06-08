@@ -802,21 +802,70 @@ app.get('/api/users/search', requireAuth, (req, res) => {
 });
 
 app.get('/api/friends', requireAuth, (req, res) => {
-  const list = db.prepare('SELECT u.id, u.username, u.role, u.avatar_bg_color, f.status FROM friends f JOIN users u ON (f.friend_id = u.id OR f.user_id = u.id) WHERE (f.user_id = ? OR f.friend_id = ?) AND u.id != ?')
-    .all(req.session.userId, req.session.userId, req.session.userId);
+  const userId = req.session.userId;
+  const list = db.prepare(`
+    SELECT u.id, u.username, u.role, u.avatar_bg_color, u.avatar_accessory, u.avatar_energy,
+           f.status, f.created_at as friend_since,
+           (SELECT COUNT(*) FROM friends f2 WHERE f2.user_id = u.id AND f2.status = 'accepted') as mutual_count
+    FROM friends f 
+    JOIN users u ON (f.friend_id = u.id OR f.user_id = u.id) 
+    WHERE (f.user_id = ? OR f.friend_id = ?) AND u.id != ?
+  `).all(userId, userId, userId);
   res.json(list);
 });
 
 app.post('/api/friends/request', requireAuth, (req, res) => {
   const { friend_id } = req.body;
-  db.prepare('INSERT OR IGNORE INTO friends (user_id, friend_id, status) VALUES (?,?,?)').run(req.session.userId, friend_id, 'pending');
+  // Check if request already exists
+  const existing = db.prepare('SELECT id FROM friends WHERE user_id = ? AND friend_id = ?').get(req.session.userId, friend_id);
+  if (existing) return res.status(400).json({ error: 'Friend request already sent' });
+  db.prepare('INSERT INTO friends (user_id, friend_id, status) VALUES (?,?,?)').run(req.session.userId, friend_id, 'pending');
   res.json({ success: true });
 });
 
 app.post('/api/friends/accept', requireAuth, (req, res) => {
   const { friend_id } = req.body;
-  db.prepare('UPDATE friends SET status = "accepted" WHERE user_id = ? AND friend_id = ?').run(friend_id, req.session.userId);
+  const result = db.prepare('UPDATE friends SET status = "accepted" WHERE user_id = ? AND friend_id = ?').run(friend_id, req.session.userId);
+  if (result.changes === 0) {
+    return res.status(404).json({ error: 'Friend request not found' });
+  }
   res.json({ success: true });
+});
+
+app.post('/api/friends/cancel', requireAuth, (req, res) => {
+  const { friend_id } = req.body;
+  db.prepare('DELETE FROM friends WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)').run(
+    req.session.userId, friend_id, friend_id, req.session.userId
+  );
+  res.json({ success: true });
+});
+
+// Friend suggestions based on portfolio overlap
+app.get('/api/friends/suggestions', requireAuth, (req, res) => {
+  const userId = req.session.userId;
+  // Get current user's holdings
+  const myHoldings = db.prepare('SELECT symbol FROM portfolio WHERE user_id = ?').all(userId).map(h => h.symbol.toUpperCase());
+  
+  // Find users with similar holdings (not already friends)
+  const suggestions = db.prepare(`
+    SELECT u.id, u.username, u.role, u.avatar_bg_color,
+           (SELECT COUNT(DISTINCT p.symbol) FROM portfolio p WHERE p.user_id = u.id AND p.symbol IN (${myHoldings.map(() => '?').join(',')})) as shared_holdings
+    FROM users u
+    WHERE u.id != ? AND u.id NOT IN (
+      SELECT user_id FROM friends WHERE friend_id = ? AND status = 'accepted'
+      UNION
+      SELECT friend_id FROM friends WHERE user_id = ? AND status = 'accepted'
+      UNION
+      SELECT user_id FROM friends WHERE friend_id = ?
+      UNION
+      SELECT friend_id FROM friends WHERE user_id = ?
+    )
+    HAVING shared_holdings > 0
+    ORDER BY shared_holdings DESC
+    LIMIT 8
+  `).all(...myHoldings, userId, userId, userId, userId);
+  
+  res.json(suggestions);
 });
 
 app.post('/api/logout', (req, res) => {
