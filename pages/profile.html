@@ -305,9 +305,26 @@
       border-color: rgba(0,229,160,0.2);
       color: var(--green);
     }
+    .connection-status.syncing {
+      background: rgba(123, 97, 255, 0.06);
+      border-color: rgba(123, 97, 255, 0.25);
+      color: #c084fc;
+    }
+    .connection-status.failed {
+      background: rgba(239, 68, 68, 0.06);
+      border-color: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+    }
     .dot {
       width: 8px; height: 8px; border-radius: 50%;
       background: currentColor; flex-shrink: 0;
+    }
+    .dot-syncing {
+      width: 8px; height: 8px; border-radius: 50%;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      animation: spin 1s linear infinite;
+      flex-shrink: 0;
     }
     .connection-status.connected .dot {
       animation: livePulse 2.2s ease-in-out infinite;
@@ -315,6 +332,10 @@
     @keyframes livePulse {
       0%,100% { box-shadow: 0 0 0 0 currentColor; }
       50%      { box-shadow: 0 0 0 6px transparent; }
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .password-wrap { position: relative; }
@@ -496,6 +517,9 @@
         <button class="nav-item" onclick="window.location.href='portfolio.html'">
           <span class="icon">💼</span> Portfolio
         </button>
+        <button class="nav-item" onclick="window.location.href='bot-trading.html'">
+          <span class="icon">🤖</span> Bot Trading
+        </button>
 
         <div class="sidebar-section-label" style="margin-top:1.25rem">Account</div>
         <button class="nav-item active" data-tab="account" onclick="switchTab('account')">
@@ -504,11 +528,17 @@
         <button class="nav-item" data-tab="api" onclick="switchTab('api')">
           <span class="icon">🔑</span> API Keys
         </button>
-        <button class="nav-item" data-tab="prefs" onclick="switchTab('prefs')">
+      <button class="nav-item" data-tab="prefs" onclick="switchTab('prefs')">
           <span class="icon">⚙️</span> Preferences
         </button>
 
+        <button class="nav-item" data-tab="sessions" onclick="switchTab('sessions')">
+          <span class="icon">🔐</span> Sessions
+        </button>
+
+
         <button class="nav-item logout" onclick="doLogout()">
+
           <span class="icon">🚪</span> Logout
         </button>
       </nav>
@@ -516,7 +546,9 @@
 
     <!-- ══ MAIN CONTENT ══════════════════════════════════════ -->
     <main class="profile-main">
+
       <div class="profile-header-top">
+
         <h1>Profile Management</h1>
         <p>Manage your account details, exchange connections, and platform preferences</p>
       </div>
@@ -597,6 +629,7 @@
       </div>
 
       <!-- ── PREFERENCES TAB ────────────────────────────── -->
+
       <div id="tabPrefs" class="settings-card">
         <div class="section-title">
           <h2>Platform Preferences</h2>
@@ -604,6 +637,12 @@
         </div>
 
         <div style="margin-top:1.5rem;">
+          <button class="btn-save" type="button" style="margin-top:0; width:100%; justify-content:center;" onclick="switchTab('sessions')">
+            <span class="label">Sessions</span>
+            <span class="check">✓</span>
+          </button>
+
+          <div style="height:1rem;"></div>
           <div class="pref-row">
             <div class="pref-label">
               <strong>Display Currency</strong>
@@ -653,6 +692,44 @@
           <span class="label">Save Preferences</span>
           <span class="check">✓ Saved</span>
         </button>
+      </div>
+
+      <!-- ── SESSIONS TAB ────────────────────────────────── -->
+      <div id="tabSessions" class="settings-card">
+        <div class="section-title">
+          <h2>Sessions</h2>
+          <p>Latest login history (mobile/device + IP address)</p>
+        </div>
+
+        <div style="margin-top:1.5rem;">
+          <div class="pref-row" style="border:none; padding:0;">
+            <div class="pref-label">
+              <strong>Recent Sessions</strong>
+              <span>Shows last login/register attempts for your account</span>
+            </div>
+            <button class="btn-save" type="button" style="padding:0.6rem 1.1rem; margin:0;" onclick="loadSessions()">
+              <span class="label">Refresh</span>
+            </button>
+          </div>
+
+          <div style="height:1rem;"></div>
+
+          <div id="sessionsEmpty" style="display:none; padding:1rem; color:var(--text2); background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.12); border-radius:16px;">
+            No login records found.
+          </div>
+
+          <table style="width:100%; border-collapse: collapse; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:18px; overflow:hidden;">
+            <thead>
+              <tr style="background: rgba(255,255,255,0.04);">
+                <th style="text-align:left; padding:0.9rem 1rem; font-size:0.8rem; color:var(--text2); text-transform:uppercase; letter-spacing:0.08em;">Date/Time</th>
+                <th style="text-align:left; padding:0.9rem 1rem; font-size:0.8rem; color:var(--text2); text-transform:uppercase; letter-spacing:0.08em;">Type</th>
+                <th style="text-align:left; padding:0.9rem 1rem; font-size:0.8rem; color:var(--text2); text-transform:uppercase; letter-spacing:0.08em;">Device</th>
+                <th style="text-align:left; padding:0.9rem 1rem; font-size:0.8rem; color:var(--text2); text-transform:uppercase; letter-spacing:0.08em;">IP</th>
+              </tr>
+            </thead>
+            <tbody id="sessionsLogsBody"></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- ── STATS STRIP ────────────────────────────────── -->
@@ -764,19 +841,35 @@
     }
 
 /* ── SAVE API KEYS ─────────────────────────────── */
+     let syncPollInterval = null;
+
      async function saveApiKeys() {
        const btn = document.getElementById('btnSaveKeys');
-       const key   = (document.getElementById('apiKey')   || {}).value?.trim() || '';
+       const keyInput = document.getElementById('apiKey');
+       const originalKey = keyInput ? keyInput.dataset.original || '' : '';
+       
+       const key   = (keyInput || {}).value?.trim() || '';
        const secret= (document.getElementById('apiSecret')|| {}).value?.trim() || '';
 
-       if (!key || !secret)
-         return window.stockwise?.toast('Both API key and secret are required','error');
+       if (!key)
+         return window.stockwise?.toast('API key is required','error');
+
+       if (key !== originalKey && secret === '••••••••••••••••') {
+         return window.stockwise?.toast('When updating your API key, you must also re-enter your API secret','error');
+       }
+
+       const body = { coindcx_key: key };
+       if (secret && secret !== '••••••••••••••••') {
+         body.coindcx_secret = secret;
+       } else if (!secret && btn.dataset.hasCoindcx !== 'true') {
+         return window.stockwise?.toast('API secret is required','error');
+       }
 
        try {
          const res = await fetch('/api/api-keys', {
            method: 'POST', credentials: 'include',
            headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify({ coindcx_key: key, coindcx_secret: secret }),
+           body: JSON.stringify(body),
          });
 
          if (!res.ok) {
@@ -789,24 +882,102 @@
          if (!data.success)
            return window.stockwise?.toast(data.error || 'Save failed','error');
 
-         btn.classList.add('saved');
-         window.stockwise?.toast('CoinDCX connected ✓','success');
-         updateConnectionStatus(true);
-         setTimeout(() => btn.classList.remove('saved'), 2200);
+btn.classList.add('saved');
+          window.stockwise?.toast('CoinDCX connected ✓','success');
+          btn.dataset.hasCoindcx = 'true';
+          if (keyInput) keyInput.dataset.original = key;
+          
+          // Refresh user state after save
+          await loadProfile();
+          
+          setTimeout(() => btn.classList.remove('saved'), 2200);
+         
+         // Trigger sync in background immediately
+         await triggerDCXSync();
        } catch(e) {
          window.stockwise?.toast('Network error — please retry','error');
        }
      }
 
-    function updateConnectionStatus(connected) {
-      const el = document.getElementById('connectionStatus');
-      if (!el) return;
-      if (connected) {
-        el.className = 'connection-status connected';
-        el.innerHTML = '<span class="dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0;"></span>'
-                     + '<span>CoinDCX connected — balance will sync automatically</span>';
-      }
-    }
+     function updateConnectionStatus(user) {
+       const el = document.getElementById('connectionStatus');
+       if (!el) return;
+       if (user && user.loggedIn && user.has_coindcx) {
+         el.style.display = 'inline-flex';
+         if (user.coindcx_sync_status === 'syncing') {
+           el.className = 'connection-status syncing';
+           el.innerHTML = '<span class="dot-syncing"></span>'
+                        + '<span>CoinDCX connected — syncing balances...</span>';
+         } else if (user.coindcx_sync_status === 'success') {
+           el.className = 'connection-status connected';
+           const lastSyncedStr = user.coindcx_last_synced ? new Date(user.coindcx_last_synced).toLocaleString() : 'just now';
+           el.innerHTML = '<span class="dot"></span>'
+                        + `<span>CoinDCX connected & synced! (Last sync: ${lastSyncedStr})</span>`;
+         } else if (user.coindcx_sync_status === 'failed') {
+           el.className = 'connection-status failed';
+           el.innerHTML = '<span class="dot"></span>'
+                        + '<span>CoinDCX connected — last sync failed. Please check your keys or retry.</span>';
+         } else {
+           el.className = 'connection-status connected';
+           el.innerHTML = '<span class="dot"></span>'
+                        + '<span>CoinDCX connected — ready to sync</span>';
+         }
+       } else {
+         el.className = 'connection-status';
+         el.innerHTML = '<span class="dot" style="background:#64748b;"></span>'
+                      + '<span>Not connected — add your CoinDCX keys below</span>';
+       }
+     }
+
+     async function triggerDCXSync() {
+       try {
+         const syncRes = await fetch('/api/sync-coindcx', {
+           method: 'POST', credentials: 'include'
+         });
+         if (syncRes.ok) {
+           window.stockwise?.toast('Sync initiated in background...', 'info');
+           const syncUser = {
+             loggedIn: true,
+             has_coindcx: true,
+             coindcx_sync_status: 'syncing',
+             coindcx_last_synced: null
+           };
+           updateConnectionStatus(syncUser);
+           startSyncPolling();
+         } else {
+           const errData = await syncRes.json().catch(() => ({}));
+           window.stockwise?.toast(errData.error || 'Sync request failed.', 'warning');
+         }
+       } catch (e) {
+         console.error(e);
+       }
+     }
+
+     function startSyncPolling() {
+       if (syncPollInterval) return;
+       syncPollInterval = setInterval(async () => {
+         try {
+           const res = await fetch('/api/me', { credentials: 'include' });
+           if (res.ok) {
+             const data = await res.json();
+             updateConnectionStatus(data);
+             if (data.coindcx_sync_status !== 'syncing') {
+               clearInterval(syncPollInterval);
+               syncPollInterval = null;
+               if (data.coindcx_sync_status === 'success') {
+                 window.stockwise?.toast('CoinDCX synced successfully!', 'success');
+                 loadStats();
+               } else if (data.coindcx_sync_status === 'failed') {
+                 window.stockwise?.toast('CoinDCX background sync failed.', 'error');
+               }
+             }
+           }
+         } catch (e) {
+           clearInterval(syncPollInterval);
+           syncPollInterval = null;
+         }
+       }, 2000);
+     }
 
     /* ── LOAD PROFILE ──────────────────────────────── */
     function setProfileFields(u) {
@@ -815,6 +986,19 @@
       document.getElementById('editUsername').value        = u.username || '';
       document.getElementById('editEmail').value           = u.email    || '';
       document.getElementById('editPhone').value           = u.phone    || '';
+
+      if (document.getElementById('apiKey')) {
+        const keyInput = document.getElementById('apiKey');
+        keyInput.value = u.coindcx_key || '';
+        keyInput.dataset.original = u.coindcx_key || '';
+      }
+if (document.getElementById('apiSecret')) {
+         document.getElementById('apiSecret').value = u.has_coindcx_secret ? '••••••••••••••••' : '';
+       }
+const btnSaveKeys = document.getElementById('btnSaveKeys');
+       if (btnSaveKeys) {
+         btnSaveKeys.dataset.hasCoindcx = u.has_coindcx_secret ? 'true' : 'false';
+       }
 
       const av = u.avatar || {};
       const avEl = document.getElementById('profileAvatar');
@@ -830,8 +1014,13 @@
         u.is_verified === 1 ? 'inline-flex' : 'none';
 
       const sel = document.getElementById('prefCurrency');
-      if (sel && u.profile_color && ['usd','inr'].includes(u.profile_color))
-        sel.value = u.profile_color;
+      if (sel) {
+        // Check currency field first, then fall back to profile_color for legacy compatibility
+        const currencyVal = (u.currency && ['usd','inr'].includes(u.currency)) ? u.currency
+          : (u.profile_color && ['usd','inr'].includes(u.profile_color)) ? u.profile_color
+          : 'inr'; // Default to INR
+        sel.value = currencyVal;
+      }
     }
 
     async function loadProfile() {
@@ -855,7 +1044,10 @@
          const res  = await fetch('/api/me', { credentials: 'include' });
          if (res.ok) {
            const data = await res.json();
-           if (data.loggedIn && data.has_coindcx) updateConnectionStatus(true);
+           updateConnectionStatus(data);
+           if (data.loggedIn && data.has_coindcx && data.coindcx_sync_status === 'syncing') {
+             startSyncPolling();
+           }
          }
        } catch(_) {}
      }
@@ -903,7 +1095,8 @@
          const res  = await fetch('/api/prefs', {
            method: 'POST', credentials: 'include',
            headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify({ profile_color: curr }),
+           // Save to both fields for cross-compatibility: profile_color (legacy) + currency (new)
+           body: JSON.stringify({ profile_color: curr, currency: curr }),
          });
 
          if (!res.ok) {
@@ -923,11 +1116,65 @@
        }
      }
 
+    async function loadSessions() {
+      try {
+        const emptyEl = document.getElementById('sessionsEmpty');
+        const bodyEl = document.getElementById('sessionsLogsBody');
+        if (bodyEl) bodyEl.innerHTML = '';
+        if (emptyEl) emptyEl.style.display = 'none';
+
+        const res = await fetch('/api/login-logs', { credentials: 'include' });
+        if (!res.ok) {
+          if (emptyEl) {
+            emptyEl.textContent = 'Unable to load login logs';
+            emptyEl.style.display = 'block';
+          }
+          return;
+        }
+
+        const logs = await res.json();
+        if (!Array.isArray(logs) || logs.length === 0) {
+          if (emptyEl) emptyEl.style.display = 'block';
+          return;
+        }
+
+        const rows = logs.slice(0, 20).map((log) => {
+          const dt = log.login_at ? new Date(log.login_at).toLocaleString() : '';
+          const type = log.login_type || '';
+          const ip = log.ip_address || 'unknown';
+          const ua = log.user_agent || '';
+          const device = ua ? ua.split(')')[0].slice(0, 60) : 'unknown';
+          const safeDevice = device || 'unknown';
+          return `
+            <tr>
+              <td style="padding:0.85rem 1rem; font-size:0.9rem; color:var(--text);">${dt}</td>
+              <td style="padding:0.85rem 1rem; font-size:0.9rem; color:var(--text);">${type}</td>
+              <td style="padding:0.85rem 1rem; font-size:0.9rem; color:var(--text); max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${safeDevice}</td>
+              <td style="padding:0.85rem 1rem; font-size:0.9rem; color:var(--text2); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;">${ip}</td>
+            </tr>
+          `;
+        }).join('');
+
+        if (bodyEl) bodyEl.innerHTML = rows;
+      } catch (e) {
+        const emptyEl = document.getElementById('sessionsEmpty');
+        if (emptyEl) {
+          emptyEl.textContent = 'Unable to load login logs';
+          emptyEl.style.display = 'block';
+        }
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       loadProfile();
       loadStats();
       loadConnectionStatus();
       loadPrefs();
+      // Auto-load sessions if user opens the tab later they can refresh
+      // but loading once on page init is quick and matches your UI expectation.
+      loadSessions();
     });
+
+
   </script>
 </html>

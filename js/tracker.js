@@ -329,9 +329,9 @@
       const coinName = escAttr(c.name || '');
       const img = escHtml(c.image || `https://www.google.com/s2/favicons?domain=${sym.toLowerCase()}&sz=64`);
 
-      const src = c.sparkline_in_7d?.price;
-      const SW = 120;
-      const SH = 32;
+const src = c.sparkline_in_7d?.price;
+       const SW = 80;
+       const SH = 20;
       const spark = (Array.isArray(src) && src.length)
         ? (() => {
             const d = sparkPath(src, SW, SH);
@@ -362,23 +362,23 @@
           </div>
           <div class="cr-price-box">
             <div class="cr-price-label">Price</div>
-            <div class="cr-price" onclick="openChartModal('${coinId}','${coinName}')" style="cursor:pointer;transition:color .2s" title="Click to view chart">${pfx}${price}</div>
-          </div>
-          <div class="cr-chg-row" style="position:relative;z-index:1">
-            <div class="chg-box"><div class="lbl">1H</div><div class="val ${chg1Cls}">${h1 > 0 ? '+' : ''}${h1.toFixed(2)}%</div></div>
-            <div class="chg-box"><div class="lbl">24H</div><div class="val ${chg24Cls}">${sign24}${h24.toFixed(2)}%</div></div>
-            <div class="chg-box"><div class="lbl">7D</div><div class="val ${chg7Cls}">${h7 > 0 ? '+' : ''}${h7.toFixed(2)}%</div></div>
-          </div>
-          <div class="cr-stats-row" style="position:relative;z-index:1">
-            <div class="stat-box" title="Market Capitalization"><span class="lbl">MCap</span><span class="val">${mcap}</span></div>
-            <div class="stat-box" title="24h Trading Volume"><span class="lbl">Volume</span><span class="val">${vol}</span></div>
-          </div>
-          <div style="height:32px;margin:0.5rem 0;position:relative;z-index:1;width:100%;overflow:hidden">${spark}</div>
-          <div class="cr-actions" style="position:relative;z-index:2">
-            <button class="cr-act-btn" onclick="event.stopPropagation();openAlertModal('${sym}',${c.current_price || 0})" title="Set price alert">🔔 Alert</button>
-            <button class="cr-act-btn" onclick="event.stopPropagation();openChartModal('${coinId}','${coinName}')" title="View detailed chart">📊 Chart</button>
-          </div>
-        </div>`;
+<div class="cr-price" onclick="openChartModal('${coinId}','${coinName}')" style="cursor:pointer;transition:color .2s" title="Click to view chart">${pfx}${price}</div>
+            </div>
+            <div class="cr-chg-row" style="position:relative;z-index:1">
+              <div class="chg-box"><div class="lbl">1H</div><div class="val ${chg1Cls}">${h1 > 0 ? '+' : ''}${h1.toFixed(2)}%</div></div>
+              <div class="chg-box"><div class="lbl">24H</div><div class="val ${chg24Cls}">${sign24}${h24.toFixed(2)}%</div></div>
+              <div class="chg-box"><div class="lbl">7D</div><div class="val ${chg7Cls}">${h7 > 0 ? '+' : ''}${h7.toFixed(2)}%</div></div>
+            </div>
+            <div class="cr-stats-row" style="position:relative;z-index:1">
+              <div class="stat-box" title="Market Capitalization"><span class="lbl">MCap</span><span class="val">${mcap}</span></div>
+              <div class="stat-box" title="24h Trading Volume"><span class="lbl">Volume</span><span class="val">${vol}</span></div>
+            </div>
+            <div style="height:20px;margin:0.25rem 0;position:relative;z-index:1;width:100%;overflow:hidden">${spark}</div>
+            <div class="cr-actions" style="position:relative;z-index:2">
+              <button class="cr-act-btn" onclick="event.stopPropagation();openAlertModal('${sym}',${c.current_price || 0})" title="Set price alert">🔔 Alert</button>
+              <button class="cr-act-btn" onclick="event.stopPropagation();openChartModal('${coinId}','${coinName}')" title="View detailed chart">📊 Chart</button>
+            </div>
+          </div>`;
     }).join('');
 
     const cc = $('coinCount'); if (cc) cc.textContent = `${coins.length} assets`;
@@ -689,12 +689,12 @@
       if (!res.ok || !me.loggedIn) return;
       const pn = $('profileName'); if (pn) pn.textContent = me.username || 'User';
       const pe = $('profileEmail'); if (pe) pe.textContent = me.email || '';
-      const avEl = $('profileAvatar');
-      if (avEl && window.stockwise?.auSvg) {
-        const av = me.avatar || {};
-        avEl.innerHTML = window.stockwise.auSvg(me.username || 'U', { bg_color: av.bg_color || '#00e5a0', texture: av.texture || 'solid', accessory: av.accessory || 'none', energy: av.energy || 'none' });
-        avEl.style.cssText = 'display:flex;align-items:center;justify-content:center;padding:0;border-radius:16px;background:transparent;';
-      }
+const avEl = $('profileAvatar');
+       if (avEl && window.auSvg) {
+         const av = me.avatar || {};
+         avEl.innerHTML = window.auSvg(me.username || 'U', { bg_color: av.bg_color || '#00e5a0', texture: av.texture || 'solid', accessory: av.accessory || 'none', energy: av.energy || 'none' });
+         avEl.style.backgroundColor = 'var(--bg3)';
+       }
       const [pRes, aRes] = await Promise.all([fetch('/api/portfolio', { credentials: 'include' }), fetch('/api/alerts', { credentials: 'include' })]);
       const portfolios = pRes.ok ? await pRes.json() : [];
       const alerts = aRes.ok ? await aRes.json() : [];

@@ -189,6 +189,7 @@ button[style*="50px"][style*="fixed"][style*="1.4rem"] {
     <li><a href="/pages/community.html">Community</a></li>
     <li><a href="/pages/avatar.html">✨ Avatar</a></li>
     <li><a href="/pages/analyzer.html">Analyzer</a></li>
+    <li><a href="/pages/bot-trading.html">Bot Trading</a></li>
     <li><a href="/pages/profile.html">Profile</a></li>
   </ul>
   <div class="nav-badge">BETA</div>
@@ -259,6 +260,10 @@ button[style*="50px"][style*="fixed"][style*="1.4rem"] {
 <script>
 // ── PROFESSIONAL LIVE ML SIGNALS ───────────────────────────────────────────
 let ALL_SIGNALS = [];
+function safeNum(x, fallback=0){ const n = Number(x); return Number.isFinite(n)?n:fallback; }
+function formatMoney(p, currency='$'){ if(p==null||!Number.isFinite(p)) return '—'; try{ return currency==='inr'?'₹'+p.toLocaleString('en-IN',{maximumFractionDigits:2}):currency==='usdt'?'₮'+p.toLocaleString('en-US',{maximumFractionDigits:2}):'$'+p.toLocaleString('en-US',{maximumFractionDigits:2}); }catch{ return '$'+p.toFixed(2);} }
+function fmtAge(ms){ if(ms<0) ms=0; const s=Math.floor(ms/1000); if(s<60) return s+'s ago'; const m=Math.floor(s/60); if(m<60) return m+'m ago'; const h=Math.floor(m/60); return h+'h ago'; }
+
 let lastUpdated = null;
 
 async function loadLiveSignals(showLoading = true) {
@@ -310,11 +315,25 @@ async function loadLiveSignals(showLoading = true) {
 
         const signal = (sig.signal || 'HOLD').toUpperCase();
         const conf = Math.round(sig.confidence || 70);
-        const entry = Number(tp.entry) || 0;
-        const pctChange = Number(forecast.expected_pct) || 0;
 
-        let target = Number(tp.take_profit) || (entry * (signal === 'BUY' ? 1.035 : 0.965));
-        let stop   = Number(tp.stop_loss)   || (entry * (signal === 'BUY' ? 0.97  : 1.03));
+        // Live anchored display
+        const priceNow = Number(sig.price_now) || Number(tp.entry) || 0;
+        const pctChange = Number(sig.change_24h ?? forecast.expected_pct) || 0;
+
+        // Trading plan levels (target/stop) should be anchored to the live price
+        let target = Number(tp.take_profit);
+        let stop   = Number(tp.stop_loss);
+
+        if (!Number.isFinite(target) || !target) {
+          target = priceNow * (signal === 'BUY' ? 1.035 : 0.965);
+        }
+        if (!Number.isFinite(stop) || !stop) {
+          stop = priceNow * (signal === 'BUY' ? 0.97 : 1.03);
+        }
+
+        // Re-anchor entry to the live price
+        const entry = priceNow;
+
 
         const rr = Number(tp.risk_reward_ratio) || 2.0;
 
@@ -394,8 +413,11 @@ async function loadLiveSignals(showLoading = true) {
       statusEl.style.borderColor = '#00b8ff44';
     }
 
-    const minsAgo = Math.floor((Date.now() - lastUpdated) / 60000);
+    // Prefer server-provided timestamp for accurate freshness
+    const serverTs = Number(data.generated_at) || Date.now();
+    const minsAgo = Math.floor((Date.now() - serverTs) / 60000);
     updatedEl.textContent = minsAgo < 1 ? 'just now' : `${minsAgo}m ago`;
+
 
     // Hero stats
     const nBuy = ALL_SIGNALS.filter(s => s.signal === 'BUY').length;

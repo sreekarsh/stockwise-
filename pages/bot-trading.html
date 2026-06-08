@@ -1,0 +1,3995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trade — CryptoAcademy Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+  <style>
+    /* ─── CRYPTOACADEMY PRO STYLES ───────────────── */
+    :root {
+      --ca-bg: #121212;
+      --ca-surface: #1e1e1e;
+      --ca-surface-header: #18181a;
+      --ca-border: #262626;
+      --ca-border-active: #3e3e42;
+      --ca-text: #e5e5ea;
+      --ca-text-muted: #8e8e93;
+      --ca-green: #0ecb81;
+      --ca-red: #f6465d;
+      --ca-yellow: #f0b90b;
+      --ca-blue: #3b82f6;
+      --ca-purple: #8b5cf6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--ca-bg);
+      color: var(--ca-text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── PREMIUM HEADER ─── */
+    .ca-navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 60px;
+      background: var(--ca-surface-header);
+      border-bottom: 1px solid var(--ca-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .ca-logo {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #fff;
+      letter-spacing: -0.2px;
+      cursor: pointer;
+    }
+
+    .ca-logo span {
+      color: var(--ca-blue);
+      font-weight: 400;
+      opacity: 0.85;
+    }
+
+    .ca-nav-tabs {
+      display: flex;
+      gap: 0.35rem;
+      margin-left: 2rem;
+    }
+
+    .ca-nav-tab {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--ca-text-muted);
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ca-nav-tab.active {
+      border-color: var(--ca-border-active);
+      background: rgba(255, 255, 255, 0.04);
+      color: #fff;
+    }
+
+    .ca-nav-tab:hover:not(.active) {
+      background: rgba(255,255,255,0.02);
+      color: #fff;
+    }
+
+    .ca-header-right {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      margin-left: auto;
+    }
+
+    .demo-badge {
+      background: rgba(240, 185, 11, 0.06);
+      border: 1px solid rgba(240, 185, 11, 0.25);
+      color: var(--ca-yellow);
+      font-size: 0.7rem;
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .header-portfolio-val {
+      font-size: 0.85rem;
+      color: var(--ca-text-muted);
+      font-weight: 500;
+    }
+
+    .header-portfolio-val strong {
+      color: var(--ca-green);
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 600;
+      margin-left: 0.25rem;
+    }
+
+    /* ─── APP GRID LAYOUT ─── */
+    .ca-app-container {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr) 380px;
+      height: calc(100vh - 60px);
+      margin-top: 60px;
+    }
+
+    @media (max-width: 1200px) {
+      .ca-app-container {
+        grid-template-columns: 250px 1fr;
+      }
+      .ca-sidebar-right {
+        display: none;
+      }
+    }
+
+    /* ─── SIDEBAR LEFT: MARKETS & INDICATORS ─── */
+    .ca-sidebar-left {
+      background: var(--ca-surface);
+      border-right: 1px solid var(--ca-border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .markets-scroll-wrap {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .indicators-static-wrap {
+      flex-shrink: 0;
+      background: rgba(20, 20, 20, 0.4);
+      border-top: 1px solid var(--ca-border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-section-title {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--ca-text-muted);
+      font-weight: 600;
+      padding: 1.15rem 1rem 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.01);
+      margin-bottom: 0.4rem;
+    }
+
+    .market-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .market-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.7rem 1rem;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+      border-left: 3px solid transparent;
+    }
+
+    .market-row:hover {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .market-row.active {
+      background: rgba(14, 203, 129, 0.04);
+      border-left-color: var(--ca-green);
+    }
+
+    .coin-ident {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .coin-circle {
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      background: #252528;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--ca-text);
+    }
+
+    .coin-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .coin-symbol {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #fff;
+    }
+
+    .coin-change {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 500;
+      margin-top: 0.1rem;
+    }
+
+    .market-price-col {
+      text-align: right;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    /* Indicators toggle pills grid */
+    .indicator-pills {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.35rem;
+      padding: 0.5rem 1rem 1.15rem;
+    }
+
+    .indicator-pill {
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid var(--ca-border);
+      color: var(--ca-text-muted);
+      padding: 0.45rem 0.55rem;
+      border-radius: 4px;
+      text-align: left;
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .indicator-pill.span-2 {
+      grid-column: span 2;
+    }
+
+    .indicator-pill:hover {
+      border-color: var(--ca-border-active);
+      color: var(--ca-text);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .indicator-pill.active {
+      background: rgba(59, 130, 246, 0.08);
+      border-color: var(--ca-blue);
+      color: var(--ca-blue);
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--ca-text-muted);
+      transition: background 0.15s;
+    }
+
+    .indicator-pill.active .pill-dot {
+      background: var(--ca-blue);
+    }
+
+    /* ─── CENTER COLUMN: PRICE HEADER, CHART, SIM TERMINAL ─── */
+    .ca-main-pane {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      border-right: 1px solid var(--ca-border);
+      overflow-y: auto;
+    }
+
+    .price-header-strip {
+      padding: 1.2rem 1.5rem 0.7rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .header-pair-title {
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #fff;
+    }
+
+    .header-pair-price {
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 600;
+      font-size: 1.35rem;
+      color: var(--ca-green);
+      margin-left: 0.75rem;
+    }
+
+    .header-pair-chg {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    /* CUSTOM CANVAS GRAPH WINDOW */
+    .canvas-chart-wrap {
+      flex: 1;
+      min-height: 380px;
+      max-height: 520px;
+      height: 450px;
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #lightweightChartContainer {
+      width: 100%;
+      height: 100%;
+      min-height: 380px;
+    }
+
+    #customChartCanvas {
+      width: 100%;
+      height: 100%;
+      background: #121212;
+      border-radius: 4px;
+      border: 1px solid var(--ca-border);
+      display: block;
+      cursor: crosshair;
+    }
+
+    /* Tooltip overlay */
+    .chart-tooltip {
+      position: absolute;
+      background: rgba(24, 24, 26, 0.98);
+      border: 1px solid var(--ca-border-active);
+      border-radius: 4px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+      line-height: 1.6;
+      pointer-events: none;
+      display: none;
+      z-index: 10;
+      min-width: 160px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    /* Candlestick chart mode toggle */
+    .chart-controls {
+      position: absolute;
+      top: 0.5rem;
+      right: 2rem;
+      display: flex;
+      gap: 0.35rem;
+      z-index: 5;
+    }
+
+    .chart-ctrl-btn {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--ca-border);
+      color: var(--ca-text-muted);
+      font-size: 0.68rem;
+      font-family: inherit;
+      font-weight: 600;
+      padding: 0.25rem 0.65rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .chart-ctrl-btn.active {
+      background: rgba(14, 203, 129, 0.08);
+      border-color: var(--ca-green);
+      color: var(--ca-green);
+    }
+
+    /* SIM TERMINAL INPUTS */
+    .sim-terminal-box {
+      padding: 1.5rem;
+      border-top: 1px solid var(--ca-border);
+      background: rgba(20, 20, 20, 0.15);
+    }
+
+    .sim-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.75rem;
+    }
+
+    .sim-side-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .sim-side-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(255,255,255,0.01);
+      padding-bottom: 0.35rem;
+    }
+
+    .sim-side-label.buy { color: var(--ca-green); }
+    .sim-side-label.sell { color: var(--ca-red); }
+
+    .sim-input-group {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .sim-input-group input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid var(--ca-border);
+      border-radius: 4px;
+      padding: 0.65rem 1rem;
+      color: var(--ca-text);
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .sim-input-group input:focus {
+      border-color: var(--ca-blue);
+    }
+
+    .sim-input-group .unit {
+      position: absolute;
+      right: 1rem;
+      font-size: 0.72rem;
+      color: var(--ca-text-muted);
+      font-family: inherit;
+      font-weight: 600;
+    }
+
+    .sim-action-btn {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 4px;
+      border: none;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      text-align: center;
+    }
+
+    .sim-action-btn.buy {
+      background: var(--ca-green);
+      color: #000;
+    }
+
+    .sim-action-btn.buy:hover {
+      opacity: 0.9;
+    }
+
+    .sim-action-btn.sell {
+      background: var(--ca-red);
+      color: #fff;
+    }
+
+    .sim-action-btn.sell:hover {
+      opacity: 0.9;
+    }
+
+    /* ─── SIDEBAR RIGHT: AI COACH & MY TRADES ─── */
+    .ca-sidebar-right {
+      background: var(--ca-surface);
+      border-left: 1px solid var(--ca-border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .sidebar-right-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--ca-border);
+      height: 48px;
+      background: rgba(20, 20, 20, 0.15);
+    }
+
+    .right-tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--ca-text-muted);
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    .right-tab-btn.active {
+      color: var(--ca-blue);
+      border-bottom-color: var(--ca-blue);
+    }
+
+    /* Right pane views */
+    .right-pane-view {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .right-pane-view.active {
+      display: flex;
+    }
+
+    /* AI Coach Chat */
+    .coach-chat-wrap {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .coach-chat-log {
+      flex: 1;
+      padding: 1.25rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .coach-chat-bubble {
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
+      max-width: 90%;
+    }
+
+    .coach-chat-bubble.bot {
+      align-self: flex-start;
+    }
+
+    .coach-chat-bubble.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .chat-avatar-circle {
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      background: #252528;
+      color: var(--ca-text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .coach-chat-bubble.bot .chat-avatar-circle {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--ca-blue);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .coach-chat-bubble.user .chat-avatar-circle {
+      background: #252528;
+      color: #fff;
+    }
+
+    .chat-bubble-body {
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid var(--ca-border);
+      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      line-height: 1.55;
+    }
+
+    .coach-chat-bubble.bot .chat-bubble-body {
+      border-top-left-radius: 2px;
+    }
+
+    .coach-chat-bubble.user .chat-bubble-body {
+      border-top-right-radius: 2px;
+      background: rgba(59, 130, 246, 0.05);
+      border-color: rgba(59, 130, 246, 0.15);
+    }
+
+    /* ─── LIVE ORDER BOOK UI COMPONENTS ─── */
+    .ob-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+      padding: 0.5rem 1rem;
+    }
+
+    .ob-header-row {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      font-size: 0.65rem;
+      color: var(--ca-text-muted);
+      font-weight: 600;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--ca-border);
+      margin-bottom: 0.25rem;
+    }
+
+    .ob-row {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.72rem;
+      padding: 0.25rem 0;
+      position: relative;
+      cursor: pointer;
+      align-items: center;
+    }
+
+    .ob-row:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .ob-depth-fill {
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      z-index: 1;
+      pointer-events: none;
+      transition: width 0.3s ease;
+    }
+
+    .ob-col {
+      position: relative;
+      z-index: 2;
+      font-weight: 500;
+    }
+
+    .ob-col.price {
+      text-align: left;
+    }
+
+    .ob-col.size {
+      text-align: right;
+      color: #fff;
+    }
+
+    .ob-col.total {
+      text-align: right;
+      color: var(--ca-text-muted);
+    }
+
+    .ob-ask .price {
+      color: var(--ca-red);
+    }
+
+    .ob-bid .price {
+      color: var(--ca-green);
+    }
+
+    .ob-ask .ob-depth-fill {
+      background: rgba(246, 70, 93, 0.06);
+    }
+
+    .ob-bid .ob-depth-fill {
+      background: rgba(14, 203, 129, 0.06);
+    }
+
+    .ob-spread-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      margin: 0.35rem 0;
+      border-top: 1px solid var(--ca-border);
+      border-bottom: 1px solid var(--ca-border);
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .ob-spread-lbl {
+      font-size: 0.65rem;
+      color: var(--ca-text-muted);
+      font-family: inherit;
+    }
+
+    .chat-input-bar {
+      padding: 1rem;
+      border-top: 1px solid var(--ca-border);
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chat-input-bar input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--ca-border);
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+      color: var(--ca-text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      outline: none;
+    }
+
+    .chat-input-bar input:focus {
+      border-color: var(--ca-border-active);
+    }
+
+    .chat-input-bar button {
+      background: transparent;
+      border: 1px solid var(--ca-border);
+      border-radius: 8px;
+      color: var(--ca-text);
+      padding: 0 1.15rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .chat-input-bar button:hover {
+      background: var(--ca-border-active);
+      color: #fff;
+    }
+
+    /* My Trades List */
+    .trades-view-wrap {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .trades-section-card {
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid var(--ca-border);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+
+    .trades-card-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--ca-text-muted);
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255,255,255,0.02);
+      padding-bottom: 0.25rem;
+    }
+
+    .micro-holding-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px dashed rgba(255,255,255,0.02);
+    }
+
+    .micro-holding-row:last-child {
+      border-bottom: none;
+    }
+
+    /* ─── AUTOMATED BOTS CONFIGURATOR ─── */
+    .bot-card {
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid var(--ca-border);
+      border-radius: 12px;
+      padding: 0.95rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      position: relative;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .bot-card:hover {
+      border-color: var(--ca-border-active);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .bot-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .bot-card-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .bot-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.2rem 0.5rem;
+      border-radius: 20px;
+    }
+    .bot-status-badge.active {
+      background: rgba(0, 229, 160, 0.08);
+      color: var(--ca-green);
+    }
+    .bot-status-badge.paused {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--ca-text-muted);
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    .bot-status-badge.active .status-dot {
+      background: var(--ca-green);
+      box-shadow: 0 0 6px var(--ca-green);
+    }
+    .bot-status-badge.paused .status-dot {
+      background: var(--ca-text-muted);
+    }
+    .bot-card-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--ca-text-muted);
+    }
+    .bot-card-actions {
+      display: flex;
+      gap: 0.45rem;
+    }
+    .bot-action-btn {
+      flex: 1;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--ca-border);
+      border-radius: 6px;
+      color: var(--ca-text);
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.35rem 0;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .bot-action-btn:hover {
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+    }
+    .bot-action-btn.delete:hover {
+      background: rgba(255, 71, 87, 0.15);
+      border-color: rgba(255, 71, 87, 0.4);
+      color: var(--ca-red);
+    }
+    .bot-logs-console {
+      background: #03070d;
+      border: 1px solid rgba(255,255,255,0.03);
+      border-radius: 6px;
+      height: 110px;
+      overflow-y: auto;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      color: #7a8fa6;
+      padding: 0.45rem;
+      line-height: 1.4;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .bot-logs-console div {
+      border-bottom: 1px solid rgba(255,255,255,0.01);
+      padding-bottom: 2px;
+      word-break: break-word;
+    }
+
+
+    /* ─── LEARNING ACADEMY PANEL (Toggled via header) ─── */
+    .ca-academy-pane {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow-y: auto;
+      padding: 7rem 2.5rem 4rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      animation: slideUp 0.4s ease forwards;
+    }
+
+    .academy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .course-card {
+      background: var(--ca-surface);
+      border: 1px solid var(--ca-border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      transition: all 0.25s;
+      cursor: pointer;
+    }
+
+    .course-card:hover {
+      border-color: var(--ca-blue);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 191, 255, 0.12);
+    }
+
+    .course-level {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+
+    .course-level.beginner { color: var(--ca-green); }
+    .course-level.intermediate { color: var(--ca-blue); }
+    .course-level.advanced { color: var(--ca-purple); }
+
+    /* ─── GENERAL BADGES ─── */
+    .pnl-pill {
+      font-size: 0.72rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 5px;
+      font-weight: 700;
+    }
+
+    .pnl-pill.profit {
+      background: rgba(0, 229, 160, 0.1);
+      color: var(--ca-green);
+    }
+
+    .pnl-pill.loss {
+      background: rgba(255, 71, 87, 0.1);
+      color: var(--ca-red);
+    }
+
+    /* CONFETTI */
+    #confettiOverlay {
+      position: fixed; inset: 0; pointer-events: none; z-index: 9999; display: none;
+    }
+
+    /* Spotlight highlights for guided visual tour */
+    .tour-highlight {
+      box-shadow: 0 0 0 9999px rgba(10, 14, 22, 0.85), 0 0 15px 5px var(--ca-blue) !important;
+      position: relative !important;
+      z-index: 10001 !important;
+      transition: all 0.3s ease-in-out;
+      pointer-events: none; /* prevent user interaction during spotlight */
+    }
+
+    .ca-sidebar-right.tour-active {
+      position: relative !important;
+      z-index: 10002 !important;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6) !important;
+      transition: all 0.3s ease-in-out;
+      pointer-events: auto !important; /* ensure right sidebar is always interactive during tour */
+    }
+
+    .pct-group {
+      display: flex;
+      width: 100%;
+      border: 1px solid var(--ca-border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: -0.3rem;
+      margin-bottom: 0.15rem;
+      background: rgba(255, 255, 255, 0.01);
+    }
+    .pct-btn {
+      flex: 1;
+      background: transparent !important;
+      border: none !important;
+      border-right: 1px solid var(--ca-border) !important;
+      color: var(--ca-text-muted) !important;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 4px 0;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.15s;
+      text-align: center;
+      border-radius: 0 !important;
+    }
+    .pct-btn:last-child {
+      border-right: none !important;
+    }
+    .pct-btn:hover {
+      background: rgba(59, 130, 246, 0.08) !important;
+      color: var(--ca-blue) !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="ca-navbar">
+    <div class="ca-logo" onclick="switchNavPane('trade')">
+      Crypto<span>Academy</span>
+    </div>
+    
+    <div class="ca-nav-tabs">
+      <button class="ca-nav-tab active" id="tabBtnTrade" onclick="switchNavPane('trade')">Trade</button>
+      <button class="ca-nav-tab" id="tabBtnLearn" onclick="switchNavPane('learn')">Learn</button>
+      <button class="ca-nav-tab" onclick="window.location.href='/signals'">Signals</button>
+    </div>
+
+    <div class="ca-header-right">
+      <!-- Currency switching option -->
+      <div style="display:flex; background:rgba(255,255,255,0.03); border:1px solid var(--ca-border); border-radius:20px; padding:2px; align-items:center; margin-right:0.65rem;">
+        <button class="curr-btn active" id="currBtnUSDT" onclick="switchCurrency('USDT')" style="background:var(--ca-green); color:#000; border:none; border-radius:20px; padding:0.3rem 0.85rem; font-family:inherit; font-size:0.75rem; font-weight:700; cursor:pointer; outline:none; transition:all 0.25s;">USDT</button>
+        <button class="curr-btn" id="currBtnINR" onclick="switchCurrency('INR')" style="background:transparent; color:var(--ca-text-muted); border:none; border-radius:20px; padding:0.3rem 0.85rem; font-family:inherit; font-size:0.75rem; font-weight:700; cursor:pointer; outline:none; transition:all 0.25s;">INR</button>
+      </div>
+      <span class="demo-badge">DEMO ACCOUNT</span>
+      <span class="header-portfolio-val">Portfolio: <strong id="headerNetVal">$10,000.00</strong></span>
+    </div>
+
+  </nav>
+
+  <!-- 1. MAIN TRADE SCREEN PANELS -->
+  <div class="ca-app-container" id="paneTradeApp">
+    
+    <!-- LEFT SIDEBAR: MARKETS & INDICATORS -->
+    <aside class="ca-sidebar-left">
+      
+      <!-- Top Markets Section (Scrollable) -->
+      <div class="sidebar-section-title">MARKETS</div>
+      <div class="markets-scroll-wrap">
+        <div class="market-list" id="sidebarMarketList">
+          <!-- Loaded dynamically with 12 major assets supporting USDT and INR quote conversion -->
+          <div class="neutral" style="text-align:center; padding:2rem 0; font-size:0.78rem; color:var(--ca-text-muted);">Loading live markets...</div>
+        </div>
+      </div>
+
+      <!-- Bottom Indicators Section (Static/Always Visible) -->
+      <div class="indicators-static-wrap">
+        <div class="sidebar-section-title">INDICATORS</div>
+        <div class="indicator-pills">
+          <button class="indicator-pill" id="ind-rsi" onclick="toggleIndicator('rsi')">
+            <span class="pill-dot"></span> RSI (14)
+          </button>
+          <button class="indicator-pill" id="ind-macd" onclick="toggleIndicator('macd')">
+            <span class="pill-dot"></span> MACD
+          </button>
+          <button class="indicator-pill" id="ind-ema" onclick="toggleIndicator('ema')">
+            <span class="pill-dot"></span> EMA (20)
+          </button>
+          <button class="indicator-pill" id="ind-bb" onclick="toggleIndicator('bb')">
+            <span class="pill-dot"></span> BB Bands
+          </button>
+          <button class="indicator-pill span-2" id="ind-volume" onclick="toggleIndicator('volume')">
+            <span class="pill-dot"></span> Volume
+          </button>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- CENTER PANE: PRICE HEAD, CANVAS GRAPH, TRADE TERMINAL -->
+    <main class="ca-main-pane">
+      
+      <div class="price-header-strip">
+        <div>
+          <span class="header-pair-title" id="centerPairTitle">BTC/USDT</span>
+          <span class="header-pair-price" id="centerPairPrice">$67,686</span>
+          <span class="header-pair-chg chg-up" id="centerPairChg" style="color:var(--ca-green)">+2.14%</span>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE GRAPH CANVAS -->
+      <div class="canvas-chart-wrap" id="chartWrap">
+        <div id="lightweightChartContainer" style="width: 100%; height: 100%;"></div>
+        <div class="chart-tooltip" id="chartTooltip"></div>
+        <div class="chart-controls">
+          <button class="chart-ctrl-btn" id="ctrlLine" onclick="setChartMode('line')">Line</button>
+          <button class="chart-ctrl-btn active" id="ctrlCandle" onclick="setChartMode('candle')">Candle</button>
+          <button class="chart-ctrl-btn" id="ctrl1h" onclick="setTimeframe('1h')">1H</button>
+          <button class="chart-ctrl-btn" id="ctrl4h" onclick="setTimeframe('4h')">4H</button>
+          <button class="chart-ctrl-btn" id="ctrl1d" onclick="setTimeframe('1d')">1D</button>
+        </div>
+      </div>
+
+      <!-- PRACTICE TERMINAL -->
+      <div class="sim-terminal-box">
+        <div class="sim-grid">
+          
+          <!-- BUY LONG COLUMN -->
+          <div class="sim-side-col">
+            <div class="sim-side-label buy">BUY LONG</div>
+            
+            <div class="sim-input-group">
+              <input type="number" id="buyQty" placeholder="Amount (e.g. 0.01)" step="0.0001">
+              <span class="unit" id="buyQtyUnit">BTC</span>
+            </div>
+            
+            <div class="pct-group">
+              <button type="button" onclick="setTradeQtyPercent('buy', 0.25)" class="pct-btn">25%</button>
+              <button type="button" onclick="setTradeQtyPercent('buy', 0.50)" class="pct-btn">50%</button>
+              <button type="button" onclick="setTradeQtyPercent('buy', 0.75)" class="pct-btn">75%</button>
+              <button type="button" onclick="setTradeQtyPercent('buy', 1.00)" class="pct-btn">100%</button>
+            </div>
+
+            <div class="sim-input-group">
+              <input type="number" id="buyPrice" placeholder="Price (USDT)">
+              <span class="unit">USDT</span>
+            </div>
+
+            <button class="sim-action-btn buy" onclick="executePracticeTrade('BUY')">BUY / LONG</button>
+          </div>
+
+          <!-- SELL SHORT COLUMN -->
+          <div class="sim-side-col">
+            <div class="sim-side-label sell">SELL SHORT</div>
+            
+            <div class="sim-input-group">
+              <input type="number" id="sellQty" placeholder="Amount (e.g. 0.01)" step="0.0001">
+              <span class="unit" id="sellQtyUnit">BTC</span>
+            </div>
+            
+            <div class="pct-group">
+              <button type="button" onclick="setTradeQtyPercent('sell', 0.25)" class="pct-btn">25%</button>
+              <button type="button" onclick="setTradeQtyPercent('sell', 0.50)" class="pct-btn">50%</button>
+              <button type="button" onclick="setTradeQtyPercent('sell', 0.75)" class="pct-btn">75%</button>
+              <button type="button" onclick="setTradeQtyPercent('sell', 1.00)" class="pct-btn">100%</button>
+            </div>
+
+            <div class="sim-input-group">
+              <input type="number" id="sellPrice" placeholder="Price (USDT)">
+              <span class="unit">USDT</span>
+            </div>
+
+            <button class="sim-action-btn sell" onclick="executePracticeTrade('SELL')">SELL / SHORT</button>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR: TABS (ORDER BOOK, AI COACH, MY TRADES & BOTS) -->
+    <aside class="ca-sidebar-right">
+      
+      <div class="sidebar-right-tabs">
+        <button class="right-tab-btn active" id="rightTabBtnOrderBook" onclick="switchRightTab('orderbook')">Order Book</button>
+        <button class="right-tab-btn" id="rightTabBtnCoach" onclick="switchRightTab('coach')">AI Coach</button>
+        <button class="right-tab-btn" id="rightTabBtnTrades" onclick="switchRightTab('trades')">My Trades</button>
+        <button class="right-tab-btn" id="rightTabBtnBots" onclick="switchRightTab('bots')">Bots</button>
+      </div>
+
+      <!-- PANE 0: LIVE ORDER BOOK -->
+      <div class="right-pane-view active" id="rightPaneOrderBook">
+        <div class="ob-container">
+          <div style="font-size: 0.72rem; color: var(--ca-text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 0.5rem; padding-bottom: 0.25rem; border-bottom: 1px solid var(--ca-border);">Live Order Book</div>
+          <div class="ob-header-row">
+            <span class="ob-col price">Price (<span class="ob-quote-unit" style="font-family: inherit;">USDT</span>)</span>
+            <span class="ob-col size" style="text-align:right;">Size (<span class="ob-base-unit" style="font-family: inherit;">BTC</span>)</span>
+            <span class="ob-col total" style="text-align:right;">Total</span>
+          </div>
+          
+          <!-- ASKS (Sells) at the top -->
+          <div id="obAsksList" style="display:flex; flex-direction:column-reverse; height:120px; overflow:hidden;">
+            <!-- Dynamic Asks -->
+          </div>
+          
+          <!-- CURRENT PRICE middle bar -->
+          <div class="ob-spread-bar">
+            <span id="obCurrentPrice" style="color:var(--ca-green); font-size:1rem;">-</span>
+            <span class="ob-spread-lbl">Spread: <span id="obSpreadVal" style="font-family:'Roboto Mono',monospace;">-</span></span>
+          </div>
+          
+          <!-- BIDS (Buys) at the bottom -->
+          <div id="obBidsList" style="display:flex; flex-direction:column; height:120px; overflow:hidden;">
+            <!-- Dynamic Bids -->
+          </div>
+        </div>
+      </div>
+
+      <!-- PANE 1: AI COACH CHAT -->
+      <div class="right-pane-view" id="rightPaneCoach">
+        <div class="coach-chat-wrap">
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:0.65rem 1rem; border-bottom:1px solid var(--ca-border); background:rgba(255,255,255,0.01);">
+            <span style="font-size:0.72rem; color:var(--ca-text-muted); font-weight:700;">AI TRADING COACH</span>
+            <button onclick="startVisualIntroTour()" style="background:rgba(41,98,255,0.1); border:1px solid rgba(41,98,255,0.3); color:var(--ca-blue); border-radius:4px; font-family:inherit; font-size:0.68rem; font-weight:700; padding:2px 8px; cursor:pointer;">🎓 Run Arena Tour</button>
+          </div>
+          
+          <div class="coach-chat-log" id="coachChatLog">
+            <!-- Welcoming message matched exactly -->
+            <div class="coach-chat-bubble bot">
+              <div class="chat-avatar-circle">AI</div>
+              <div class="chat-bubble-body">
+                👋 <strong>Welcome to your Premium Trading Arena!</strong> I am your personal AI Trading Coach.
+                <br><br>
+                I am here to teach you technical setups, reading candlestick wicks, order book dynamics, and deploying grid algorithms risk-free using <strong>$10,000 practice funds</strong>!
+                <br><br>
+                How would you like to start today?
+                <div style="display:flex; flex-direction:column; gap:0.5rem; margin-top:0.75rem;">
+                  <button onclick="startVisualIntroTour()" style="background:var(--ca-blue); color:#fff; border:none; border-radius:6px; padding:0.5rem; font-family:inherit; font-size:0.75rem; font-weight:700; cursor:pointer; text-align:left; display:flex; align-items:center; gap:0.35rem;">
+                    🎓 <span>Option 1: Guided Academy Tour (Highly Recommended)</span>
+                  </button>
+                  <button onclick="startCoachTutorial()" style="background:rgba(255,255,255,0.03); border:1px solid var(--ca-border); color:var(--ca-text); border-radius:6px; padding:0.5rem; font-family:inherit; font-size:0.75rem; font-weight:700; cursor:pointer; text-align:left; display:flex; align-items:center; gap:0.35rem;">
+                    📖 <span>Option 2: Study Technical Analysis Basics</span>
+                  </button>
+                  <button onclick="dismissIntroTour()" style="background:transparent; border:1px dashed var(--ca-border); color:var(--ca-text-muted); border-radius:6px; padding:0.4rem; font-family:inherit; font-size:0.72rem; cursor:pointer; text-align:center;">
+                    Let Me Explore on My Own
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input-bar">
+            <input type="text" id="coachInput" placeholder="Ask AI coach..." onkeypress="if(event.key==='Enter')sendCoachChat()">
+            <button onclick="sendCoachChat()">Send</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PANE 2: MY TRADES & SIM HOLDINGS -->
+      <div class="right-pane-view" id="rightPaneTrades">
+        <div class="trades-view-wrap">
+          
+          <!-- Practice Portfolio summary -->
+          <div class="trades-section-card">
+            <div class="trades-card-title">Demo Portfolio Summary</div>
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:0.5rem;">
+              <span>Net Valuation:</span>
+              <strong id="tradesNetVal" style="color:var(--ca-green)">$10,000.00</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:0.85rem;">
+              <span>USDT Cash:</span>
+              <strong id="tradesCashVal" style="color:#fff">$10,000.00</strong>
+            </div>
+            <button class="btn-sm danger" style="width:100%; border-radius:6px; font-size:0.75rem;" onclick="resetPracticeAccount()">Reset Practice Account</button>
+          </div>
+
+          <!-- Current holdings -->
+          <div class="trades-section-card">
+            <div class="trades-card-title">Virtual Holdings</div>
+            <div id="holdingsList">
+              <div class="neutral" style="font-size:0.78rem; text-align:center; padding:1rem 0;">No active practice holdings.</div>
+            </div>
+          </div>
+
+          <!-- Trade logs ledger -->
+          <div class="trades-section-card" style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+            <div class="trades-card-title">Simulated History</div>
+            <div id="tradesLedger" style="flex:1; overflow-y:auto; font-size:0.72rem; display:flex; flex-direction:column; gap:0.45rem;">
+              <div class="neutral" style="text-align:center; padding:1rem 0;">No practice logs.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PANE 3: BOTS CONFIGURATOR -->
+      <div class="right-pane-view" id="rightPaneBots">
+        <div class="trades-view-wrap" style="padding:1rem; overflow-y:auto;">
+          
+          <!-- Deploy New Bot -->
+          <div class="trades-section-card" style="margin-bottom:1rem;">
+            <div class="trades-card-title" style="margin-bottom:0.55rem;">Deploy Simulated Bot</div>
+            
+            <div class="form-group" style="margin-bottom:0.6rem; display:flex; flex-direction:column; gap:2px;">
+              <label style="font-size:0.7rem; color:var(--ca-text-muted); font-weight:700;">BOT NAME</label>
+              <input type="text" id="botName" placeholder="e.g. RSI Momentum Scalper" style="width:100%; background:rgba(255,255,255,0.02); border:1px solid var(--ca-border); border-radius:6px; padding:0.45rem; color:#fff; font-family:inherit; font-size:0.78rem; outline:none;">
+            </div>
+
+            <div style="display:flex; gap:0.45rem; margin-bottom:0.6rem;">
+              <div style="flex:1; display:flex; flex-direction:column; gap:2px;">
+                <label style="font-size:0.7rem; color:var(--ca-text-muted); font-weight:700;">STRATEGY</label>
+                <select id="botStrategy" onchange="adjustStrategyParams()" style="width:100%; background:var(--ca-surface); border:1px solid var(--ca-border); border-radius:6px; padding:0.45rem; color:#fff; font-family:inherit; font-size:0.78rem; outline:none;">
+                  <option value="RSI">RSI Momentum</option>
+                  <option value="MACD">MACD Crossover</option>
+                  <option value="Grid">Grid Scalper</option>
+                </select>
+              </div>
+              <div style="flex:1; display:flex; flex-direction:column; gap:2px;">
+                <label style="font-size:0.7rem; color:var(--ca-text-muted); font-weight:700;">PAIR</label>
+                <select id="botSymbol" style="width:100%; background:var(--ca-surface); border:1px solid var(--ca-border); border-radius:6px; padding:0.45rem; color:#fff; font-family:inherit; font-size:0.78rem; outline:none;">
+                  <option value="BTC">BTC/USDT</option>
+                  <option value="ETH">ETH/USDT</option>
+                  <option value="SOL">SOL/USDT</option>
+                  <option value="BNB">BNB/USDT</option>
+                  <option value="ADA">ADA/USDT</option>
+                  <option value="XRP">XRP/USDT</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Parameters section dynamically updated -->
+            <div id="strategyParams" style="margin-bottom:0.75rem; border-top:1px solid rgba(255,255,255,0.02); padding-top:0.5rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; font-size:0.72rem;">
+                <span>RSI Buy Threshold:</span>
+                <input type="number" id="paramRsiBuy" value="35" min="5" max="95" style="width:48px; background:rgba(255,255,255,0.02); border:1px solid var(--ca-border); text-align:center; color:#fff; border-radius:4px; padding:2px; font-family:inherit; font-size:0.72rem;">
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.72rem;">
+                <span>RSI Sell Threshold:</span>
+                <input type="number" id="paramRsiSell" value="65" min="5" max="95" style="width:48px; background:rgba(255,255,255,0.02); border:1px solid var(--ca-border); text-align:center; color:#fff; border-radius:4px; padding:2px; font-family:inherit; font-size:0.72rem;">
+              </div>
+            </div>
+
+            <button class="btn-sm" style="width:100%; border-radius:6px; font-size:0.78rem; background:var(--ca-green); color:#000; font-weight:700; border:none; padding:0.55rem; cursor:pointer;" onclick="createTradingBot()">Deploy Bot Script</button>
+          </div>
+
+          <!-- Deployed Bots List -->
+          <div class="trades-section-card" style="display:flex; flex-direction:column; overflow:hidden;">
+            <div class="trades-card-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.65rem;">
+              <span>Telemetry Monitor</span>
+              <span id="botCountBadge" style="background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:20px; font-size:0.65rem;">0/5</span>
+            </div>
+            <div id="botsListContainer" style="display:flex; flex-direction:column; gap:0.75rem;">
+              <div class="neutral" style="text-align:center; padding:1.5rem 0; font-size:0.78rem; color:var(--ca-text-muted);">No active simulated bots.<br><small style="opacity:0.6">Deploy a script above to start simulation.</small></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </aside>
+
+
+  </div>
+
+  <!-- 2. STUDY ACADEMY AREA (Toggled via Nav tab Learn) -->
+  <div class="ca-academy-pane" id="paneLearnApp">
+    
+    <h2 style="font-family:'Syne',sans-serif; font-weight:800; font-size:2rem; background: linear-gradient(135deg, #fff, var(--ca-blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">
+      CryptoAcademy Courses
+    </h2>
+    <p style="color:var(--ca-text-muted); font-size:0.9rem; margin-top:0.25rem;">Pass modules to gain experience points & unlock professional trader status.</p>
+    
+    <div class="academy-grid" id="academyGrid">
+      <!-- Courses loaded dynamically -->
+    </div>
+
+  </div>
+
+  <!-- STUDY LESSON POPUP MODAL -->
+  <div class="modal-backdrop" id="academyPopup" onclick="if(event.target===this)closeAcademyPopup()">
+    <div class="modal" style="max-width: 650px; background:var(--ca-surface); border:1px solid var(--ca-border);">
+      <button class="modal-close" onclick="closeAcademyPopup()">×</button>
+      <h2 id="academyModalTitle" style="font-family:'Syne',sans-serif; color:var(--ca-blue); font-weight:800; font-size:1.65rem; margin-bottom:0.25rem;">Lesson Title</h2>
+      <div style="font-size:0.75rem; color:var(--ca-text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:1.25rem; font-weight:700;" id="academyModalSubtitle">Lesson Metadata</div>
+      
+      <div class="quiz-modal-body">
+        <div id="academyLessonContent" style="font-size:0.92rem; line-height:1.75; color:var(--ca-text); border-bottom:1px solid var(--ca-border); padding-bottom:1.5rem;">
+          Lesson content article...
+        </div>
+        
+        <div style="margin-top:1.25rem;">
+          <h4 style="font-family:'Syne',sans-serif; font-weight:700; font-size:1.05rem; margin-bottom:0.75rem; color:var(--ca-green);">Interactive Quick Quiz</h4>
+          <p id="academyQuizQuestion" style="font-size:0.92rem; margin-bottom:1rem; color:var(--ca-text);">Quiz Question text...</p>
+          <div class="quiz-options" id="academyQuizOptions">
+            <!-- Options buttons loaded dynamically -->
+          </div>
+        </div>
+        
+        <button class="btn-full" style="border-radius:12px; margin-top:1.25rem; background:var(--ca-blue); color:#fff;" onclick="submitAcademyQuizAnswer()">SUBMIT QUIZ ANSWER</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFETTI -->
+  <div id="confettiOverlay"></div>
+
+  <!-- DYNAMIC TRADING MODE SELECTION DISCLAIMER MODAL -->
+  <div class="modal-backdrop" id="modeSelectorModal" style="display: none; align-items: center; justify-content: center; z-index: 10005;">
+    <div class="modal" style="background: var(--ca-surface); border: 1px solid var(--ca-border); max-width: 500px; padding: 2rem; border-radius: 16px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.6); position: relative; animation: slideUp 0.3s ease forwards;">
+      <h2 style="font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.65rem; color: #fff; margin-bottom: 0.5rem; letter-spacing: -0.5px;">
+        Choose Your <span style="color:var(--ca-green);">Trading Mode</span>
+      </h2>
+      <p style="color: var(--ca-text-muted); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1.75rem;">
+        Welcome to the Crypto Trading Arena! Select whether you want to learn layout controls and technical indicators with an interactive AI Coach tour or enter pro manual mode directly.
+      </p>
+      
+      <div style="display: flex; flex-direction: column; gap: 0.95rem; text-align: left;">
+        
+        <!-- OPTION 1: LEARN WITH AI COACH -->
+        <button onclick="selectTradingMode('ai')" style="background: rgba(41, 98, 255, 0.08); border: 1px solid rgba(41, 98, 255, 0.3); border-radius: 12px; padding: 1.15rem; cursor: pointer; display: flex; align-items: flex-start; gap: 0.85rem; transition: all 0.25s; text-align: left; width: 100%; outline: none;" 
+                onmouseover="this.style.background='rgba(41, 98, 255, 0.15)'; this.style.borderColor='var(--ca-blue)';" 
+                onmouseout="this.style.background='rgba(41, 98, 255, 0.08)'; this.style.borderColor='rgba(41, 98, 255, 0.3)';">
+          <span style="font-size: 1.65rem; line-height: 1;">🎓</span>
+          <div>
+            <strong style="color: #fff; font-size: 0.92rem; display: block; margin-bottom: 2px;">AI-Guided Coach Mode (Recommended)</strong>
+            <span style="color: var(--ca-text-muted); font-size: 0.76rem; line-height: 1.4; display: block;">
+              Interactive layout walkthough spotlighting markets, wicks, live practice terminal, and bots configurator w/ reward XP!
+            </span>
+          </div>
+        </button>
+        
+        <!-- OPTION 2: PRO MANUAL EXPLORER -->
+        <button onclick="selectTradingMode('manual')" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--ca-border); border-radius: 12px; padding: 1.15rem; cursor: pointer; display: flex; align-items: flex-start; gap: 0.85rem; transition: all 0.25s; text-align: left; width: 100%; outline: none;" 
+                onmouseover="this.style.background='rgba(255, 255, 255, 0.04)'; this.style.borderColor='var(--ca-border-active)';" 
+                onmouseout="this.style.background='rgba(255, 255, 255, 0.02)'; this.style.borderColor='var(--ca-border)';">
+          <span style="font-size: 1.65rem; line-height: 1;">💼</span>
+          <div>
+            <strong style="color: #fff; font-size: 0.92rem; display: block; margin-bottom: 2px;">Manual Pro Explorer</strong>
+            <span style="color: var(--ca-text-muted); font-size: 0.76rem; line-height: 1.4; display: block;">
+              Skip the intro tour and jump straight to the arena. Directly trade test coins and deploy automated scripts independently.
+            </span>
+          </div>
+        </button>
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-backdrop" id="authModal" onclick="if(event.target===this)closeAuth()">
+    <div class="modal" style="background:var(--ca-surface); border:1px solid var(--ca-border); max-width:440px;">
+      <button class="modal-close" onclick="closeAuth()">×</button>
+      <h2 style="font-family:'Syne',sans-serif;font-weight:800;">Sync <span style="color:var(--ca-green)">CryptoAcademy</span></h2>
+      <p class="modal-sub" style="color:var(--ca-text-muted)">Login to sync your demo balances & learning progress.</p>
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-tab="login" onclick="switchTabModal('login')">Login</button>
+        <button class="modal-tab" data-tab="register" onclick="switchTabModal('register')">Register</button>
+      </div>
+      <div id="loginForm">
+        <form onsubmit="doLogin(event)">
+          <div class="form-group"><label>Email</label><input type="email" id="loginEmail" required style="background:rgba(255,255,255,0.02)"></div>
+          <div class="form-group"><label>Password</label><input type="password" id="loginPass" required style="background:rgba(255,255,255,0.02)"></div>
+          <button type="submit" class="btn-full" style="background:var(--ca-green); color:#000;">Sync Account →</button>
+        </form>
+      </div>
+      <p class="error-msg" id="authError"></p>
+    </div>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script>
+    // ─── STATE VARIABLES ───────────────────────────
+    let currentAsset = 'BTC';
+    let demoBalance = 10000.00;
+    let demoPortfolio = [];
+    let completedLessonsList = [];
+    let selectedQuizAnswerIdx = null;
+    let activeQuizObj = null;
+    let chartMode = 'candle';   // 'line' or 'candle'
+    let chartTimeframe = '1h';
+    let isLoggedIn = false;   // tracks auth state for demo fallback
+    let activeBotsList = [];
+    let botLogsIntervals = {}; // keeps track of individual bot log update loops
+    let selectedCurrency = 'USDT'; // 'USDT' or 'INR'
+    let tetherRate = 84.00; // USDT→INR conversion rate — updated live from CoinDCX
+    let hoveredChartIdx = null;
+    let hoveredMouseX = 0;
+    let hoveredMouseY = 0;
+    let coachTutorialStep = 0;
+
+    // TradingView Lightweight Charts & WebSockets state
+    let chartWidget = null;
+    let candleSeries = null;
+    let lineSeries = null;
+    let volumeSeries = null;
+    let ema20Series = null;
+    let ema50Series = null;
+    let bbUpperSeries = null;
+    let bbLowerSeries = null;
+    let activeWsConnection = null;
+
+    // Toggled indicators
+    let activeIndicators = {
+      rsi: true,
+      macd: false,
+      ema: true,
+      bb: false,
+      volume: true
+    };
+
+    // Expanded 12 major cryptocurrency assets with both price (live active) and basePrice (baseline USD price)
+    const ASSETS = {
+      'BTC':  { name: 'Bitcoin',    basePrice: 87000.00,   price: 87000.00,   change: 2.32,  color: '#f7931a', textClr: '#fff', char: 'B', cgId: 'bitcoin',       dcxSymbol: 'BTCINR'  },
+      'ETH':  { name: 'Ethereum',   basePrice: 2380.00,    price: 2380.00,    change: 1.74,  color: '#627eea', textClr: '#fff', char: 'E', cgId: 'ethereum',      dcxSymbol: 'ETHINR'  },
+      'SOL':  { name: 'Solana',     basePrice: 170.00,     price: 170.00,     change: -0.57, color: '#9945ff', textClr: '#fff', char: 'S', cgId: 'solana',        dcxSymbol: 'SOLINR'  },
+      'BNB':  { name: 'BNB',        basePrice: 680.00,     price: 680.00,     change: 0.19,  color: '#f3ba2f', textClr: '#111', char: 'B', cgId: 'binancecoin',   dcxSymbol: 'BNBINR'  },
+      'ADA':  { name: 'Cardano',    basePrice: 0.390,      price: 0.390,      change: -1.20, color: '#0033ad', textClr: '#fff', char: 'A', cgId: 'cardano',       dcxSymbol: 'ADAINR'  },
+      'XRP':  { name: 'Ripple',     basePrice: 2.20,       price: 2.20,       change: 3.11,  color: '#23a55a', textClr: '#fff', char: 'X', cgId: 'ripple',        dcxSymbol: 'XRPINR'  },
+      'DOT':  { name: 'Polkadot',   basePrice: 4.50,       price: 4.50,       change: 1.15,  color: '#e6007a', textClr: '#fff', char: 'P', cgId: 'polkadot',      dcxSymbol: 'DOTINR'  },
+      'DOGE': { name: 'Dogecoin',   basePrice: 0.180,      price: 0.180,      change: -2.35, color: '#c2a633', textClr: '#111', char: 'D', cgId: 'dogecoin',      dcxSymbol: 'DOGEINR' },
+      'AVAX': { name: 'Avalanche',  basePrice: 22.50,      price: 22.50,      change: 0.85,  color: '#e84142', textClr: '#fff', char: 'A', cgId: 'avalanche-2',   dcxSymbol: 'AVAXINR' },
+      'MATIC':{ name: 'Polygon',    basePrice: 0.240,      price: 0.240,      change: -1.48, color: '#8247e5', textClr: '#fff', char: 'M', cgId: 'matic-network', dcxSymbol: 'POLINR'  },
+      'LINK': { name: 'Chainlink',  basePrice: 13.50,      price: 13.50,      change: 2.12,  color: '#2a5ada', textClr: '#fff', char: 'L', cgId: 'chainlink',     dcxSymbol: 'LINKINR' },
+      'SHIB': { name: 'Shiba Inu',  basePrice: 0.0000130,  price: 0.0000130,  change: -3.42, color: '#ff9900', textClr: '#111', char: 'S', cgId: 'shiba-inu',     dcxSymbol: 'SHIBINR' }
+    };
+
+
+    // ─── CHART MODE & TIMEFRAME ─────────────────────
+    function setChartMode(mode) {
+      chartMode = mode;
+      document.getElementById('ctrlLine').classList.toggle('active', mode === 'line');
+      document.getElementById('ctrlCandle').classList.toggle('active', mode === 'candle');
+      drawChart();
+    }
+
+    function setTimeframe(tf) {
+      chartTimeframe = tf;
+      ['1h','4h','1d'].forEach(t => {
+        const el = document.getElementById('ctrl' + t);
+        if (el) el.classList.toggle('active', t === tf);
+      });
+      fetchAndRedrawChart();
+    }
+
+    // ─── ACADEMY SYLLABUS ───
+    const ACADEMY_LESSONS = [
+      {
+        id: 'beg_intro',
+        title: 'Cryptocurrency & Order Book 101',
+        category: 'Beginner',
+        categoryClass: 'beginner',
+        desc: 'Understand blockchain fundamentals, market structure, and how bid/ask order books function.',
+        xpReward: 50,
+        article: `<h3>Blockchain & Tokens</h3>
+        Cryptocurrencies are decentralized digital currencies running on blockchain networks. The core idea is trustless peer-to-peer transacting without intermediate centralized banks.
+        <br><br>
+        <h3>The Order Book</h3>
+        A trading platform handles trades using an <strong>Order Book</strong>, which is a ledger displaying buy orders (<strong>Bids</strong>) and sell orders (<strong>Asks</strong>). 
+        <ul>
+          <li><strong>Bids</strong> represent buyers hoping to purchase at lower prices. The highest bid is the best buying price.</li>
+          <li><strong>Asks</strong> represent sellers hoping to sell at higher prices. The lowest ask is the best selling price.</li>
+          <li>The price gap between the best bid and the best ask is called the <strong>Spread</strong>. Liquidity refers to how tightly packed the orders are inside the ledger.</li>
+        </ul>`,
+        quiz: {
+          question: 'What term describes the gap between the highest bid and lowest ask in an order book?',
+          options: ['Market Liquidity', 'Price Slippage', 'Bid-Ask Spread', 'Bollinger Band Margin'],
+          correctIdx: 2
+        }
+      },
+      {
+        id: 'int_candles',
+        title: 'Reading Candlestick Patterns',
+        category: 'Intermediate',
+        categoryClass: 'intermediate',
+        desc: 'Learn to read candles, timeframes, and recognize powerful reversal candlesticks.',
+        xpReward: 75,
+        article: `<h3>Anatomy of a Candlestick</h3>
+        A candlestick charts prices across a defined timeframe (e.g. 1 hour, 1 day).
+        <ul>
+          <li><strong>Real Body</strong>: The solid central area, representing the price range between the Open and the Close. Green represents a bullish period (Close higher than Open), and red is bearish.</li>
+          <li><strong>Shadows/Wicks</strong>: The thin lines extending above and below the body, tracking the High and Low prices touched during that timeframe.</li>
+        </ul>
+        <br>
+        <h3>Key Reversal Candlesticks</h3>
+        Candlestick shapes express trader sentiment:
+        <ul>
+          <li><strong>Doji</strong>: The open and close are virtually equal. It demonstrates intense market indecision. When followed by major volume, it often flags an upcoming trend reversal.</li>
+          <li><strong>Hammer</strong>: Small body with a very long lower shadow (at least double the body size). Found at the bottom of downtrends, it signals sellers dominated early but buyers aggressively pushed prices back up. Highly bullish reversal.</li>
+        </ul>`,
+        quiz: {
+          question: 'What is indicated by a Hammer candlestick appearing at the bottom of a steep downtrend?',
+          options: ['Sellers have consolidated complete control', 'Potential bullish reversal as buyers reject lower prices', 'The coin is entering an extended sideways correction', 'High transaction volume with zero price movement'],
+          correctIdx: 1
+        }
+      },
+      {
+        id: 'int_rsi',
+        title: 'Indicator Study: RSI (Relative Strength Index)',
+        category: 'Intermediate',
+        categoryClass: 'intermediate',
+        desc: 'Master RSI levels, overbought/oversold limits, and trading divergences.',
+        xpReward: 75,
+        article: `<h3>Relative Strength Index (RSI)</h3>
+        RSI is a momentum oscillator mapping velocity and changes in price movements on a scale from <strong>0 to 100</strong>.
+        <br><br>
+        <h3>Standard Thresholds</h3>
+        <ul>
+          <li><strong>RSI > 70</strong>: The asset is mathematically considered <strong>Overbought</strong>. Price momentum is highly stretched, signifying it may be prone to a bearish correction or pullback.</li>
+          <li><strong>RSI < 30</strong>: The asset is considered <strong>Oversold</strong>. Selling pressure has reached extremes, meaning the coin could be undervalued and primed for a bounce.</li>
+        </ul>
+        <br>
+        <h3>RSI Trading Tip</h3>
+        Be careful: in powerful macro trends, RSI can remain overbought/oversold for weeks! Always combine RSI signals with trend markers like MACD or moving averages for confirmation.`,
+        quiz: {
+          question: 'In standard technical indicator analysis, what RSI level typically indicates an oversold asset?',
+          options: ['Above 70', 'Below 30', 'Exactly 50', 'Between 55 and 65'],
+          correctIdx: 1
+        }
+      },
+      {
+        id: 'adv_grid',
+        title: 'Understanding Grid Trading Bots',
+        category: 'Advanced',
+        categoryClass: 'advanced',
+        desc: 'Learn about automated Grid algorithms, range trading, and volatile consolidation strategies.',
+        xpReward: 100,
+        article: `<h3>What is Grid Trading?</h3>
+        Grid trading is an automated strategy that deploys a grid of limit buy and sell orders at incremental intervals within a defined price range.
+        <br><br>
+        <h3>How Grid Trading Works</h3>
+        <ul>
+          <li>The grid bot performs best in a <strong>sideways consolidative range</strong>, rather than an intense breakout trend.</li>
+          <li>As the price drops, the bot hits the buy grids, stacking cheap asset shares.</li>
+          <li>When the price rises back, it hits the sell grids, capitalizing on minor micro-volatility fluctuations.</li>
+          <li><strong>Risk</strong>: If the price breaks down below the lowest grid, the bot ends up holding maximum asset quantities that are losing value. If it breaks out upward, it sells everything early, missing the bullish run.</li>
+        </ul>`,
+        quiz: {
+          question: 'In which market environment does a Grid trading bot perform most optimally?',
+          options: ['Strong directional upward breakout trend', 'Extreme downward selloff panic', 'Range-bound, sideways consolidating market', 'Highly illiquid, zero-activity market'],
+          correctIdx: 2
+        }
+      }
+    ];
+
+    // ─── INITIALIZATION ───
+    document.addEventListener('DOMContentLoaded', () => {
+      // Setup window resize listener
+      window.addEventListener('resize', () => {
+        if (chartWidget) {
+          const container = document.getElementById('lightweightChartContainer');
+          if (container) chartWidget.resize(container.clientWidth, container.clientHeight || 420);
+        }
+      });
+
+      // Initialize chart after a small delay so the DOM layout is fully painted
+      setTimeout(() => {
+        initLightweightChart();
+        // Show seeded simulation immediately so chart is never blank
+        loadSeededSimulation();
+        // Then load real data after another brief delay
+        setTimeout(() => { selectMarket('BTC'); }, 300);
+      }, 100);
+
+      // Load active indicator styles on left side
+      refreshIndicatorUI();
+
+      // Load learning academy syllabus
+      renderAcademy();
+
+      // Try to sync server account; fall back to offline demo mode gracefully
+      loadAccountData();
+      setInterval(loadAccountData, 10000);
+
+      // Load simulated bots configurator state
+      setTimeout(loadBots, 100);
+
+      // Start client-side background simulation for offline users
+      setInterval(runOfflineBots, 12000);
+
+      // Also update prices from public API if available
+      fetchLivePrices();
+      setInterval(fetchLivePrices, 15000);
+
+      // Canvas mouse hover for tooltip (safe check since customChartCanvas is replaced by Lightweight Charts)
+      const canvas = document.getElementById('customChartCanvas');
+      if (canvas) {
+        canvas.addEventListener('mousemove', onChartMouseMove);
+        canvas.addEventListener('mouseleave', () => {
+          hoveredChartIdx = null;
+          drawChart();
+        });
+      }
+
+      // Open the starting mode selector modal for new users on entry
+      setTimeout(() => {
+        if (!localStorage.getItem('ca_intro_seen')) {
+          const modal = document.getElementById('modeSelectorModal');
+          if (modal) {
+            modal.style.display = 'flex';
+          }
+        }
+      }, 1200);
+
+      // Start real-time price wiggling/fluctuation simulator for UI realism
+      setInterval(() => {
+        const coin = currentAsset;
+        const currentData = ASSETS[coin];
+        if (currentData && currentData.price) {
+          // 0.02% maximum random fluctuation
+          const changePercent = (Math.random() - 0.5) * 0.0004;
+          currentData.price = currentData.price * (1 + changePercent);
+          
+          // Re-draw chart to animate the last candle and price HUD
+          drawChart();
+
+          // Update order book
+          updateOrderBook();
+          
+          // Also update the header price display smoothly
+          const prefix = selectedCurrency === 'INR' ? '₹' : '$';
+          const dec = coin === 'SHIB' ? 6 : (coin === 'ADA' || coin === 'XRP' || currentData.price < 1 ? 4 : 2);
+          const priceEl = document.getElementById('centerPairPrice');
+          if (priceEl) priceEl.textContent = prefix + currentData.price.toLocaleString('en-US', { maximumFractionDigits: dec, minimumFractionDigits: coin === 'SHIB' ? 6 : 2 });
+        }
+      }, 2000);
+    });
+
+
+    // ─── FETCH DYNAMIC LIVE PRICES DIRECT OR FALLBACK ───
+    async function fetchUSDTGeckoPrices() {
+      // 1. Try server pro proxy simple simple route first
+      try {
+        const ids = Object.values(ASSETS).map(a => a.cgId).join(',');
+        const res = await fetch(`/api/coingecko-pro-price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && !data.error && Object.keys(data).length > 0) return data;
+        }
+      } catch(e) {}
+
+      // 2. Fallback: fetch directly from public CoinGecko Simple Price API in client browser (CORS enabled)
+      try {
+        const ids = Object.values(ASSETS).map(a => a.cgId).join(',');
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
+        if (res.ok) {
+          return await res.json();
+        }
+      } catch(e) {}
+      return null;
+    }
+
+    async function fetchINRDCXPrices() {
+      // Try server CoinDCX markets proxy first
+      try {
+        const res = await fetch('/api/coindcx/markets?fresh=1&vs_currency=inr');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) return data;
+        }
+      } catch(e) {}
+
+      // Direct CoinDCX exchange ticker (public, CORS enabled)
+      try {
+        const res = await fetch('https://api.coindcx.com/exchange/ticker');
+        if (res.ok) {
+          const tickers = await res.json();
+          if (Array.isArray(tickers)) {
+            // Build a lookup map: market name -> last_price
+            const tickerMap = {};
+            tickers.forEach(t => {
+              if (t.market && t.last_price) tickerMap[t.market.toUpperCase()] = t;
+            });
+
+            // Map each ASSET to its CoinDCX INR pair price using the dcxSymbol field
+            const result = [];
+            Object.entries(ASSETS).forEach(([sym, a]) => {
+              // Try primary dcxSymbol, then fallback to SYM+INR
+              const market = a.dcxSymbol || (sym + 'INR');
+              const ticker = tickerMap[market.toUpperCase()];
+              if (ticker && ticker.last_price) {
+                result.push({
+                  symbol: sym,
+                  current_price: parseFloat(ticker.last_price),
+                  price_change_percentage_24h: parseFloat(ticker.change_24_hour || 0)
+                });
+              }
+            });
+            if (result.length > 0) return result;
+          }
+        }
+      } catch(e) {}
+      return null;
+    }
+
+    // Compute real USD→INR rate by comparing BTC price on CoinDCX (INR) vs Binance (USDT)
+    // NEVER use CoinDCX's USDTINR pair — it trades at ~₹100 premium vs real USD/INR ~₹84
+    async function computeRealINRRate() {
+      try {
+        const res = await fetch('https://api.coindcx.com/exchange/ticker');
+        if (res.ok) {
+          const tickers = await res.json();
+          const btcInrTicker = tickers.find(t => String(t.market || '').toUpperCase() === 'BTCINR');
+          if (btcInrTicker && btcInrTicker.last_price) {
+            const btcInr = parseFloat(btcInrTicker.last_price);
+            const btcUsdt = ASSETS['BTC'].basePrice; // USDT price from CoinGecko
+            if (btcUsdt > 0 && btcInr > 0) {
+              const rate = btcInr / btcUsdt;
+              // Sanity check: real USD/INR should be 75–95
+              if (rate > 75 && rate < 95) {
+                tetherRate = parseFloat(rate.toFixed(2));
+                console.log(`✅ Real USD/INR rate (BTC ratio): ₹${tetherRate}`);
+                return tetherRate;
+              }
+            }
+          }
+        }
+      } catch(e) {
+        console.warn('computeRealINRRate failed, keeping tetherRate:', tetherRate);
+      }
+      return tetherRate;
+    }
+
+    // ─── CURRENCY SWITCHER: INR (₹) / USDT ($) ───
+    function switchCurrency(currency) {
+      if (selectedCurrency === currency) return;
+      selectedCurrency = currency;
+      
+      // Update toggle buttons classes
+      document.getElementById('currBtnUSDT').classList.toggle('active', currency === 'USDT');
+      document.getElementById('currBtnUSDT').style.background = currency === 'USDT' ? 'var(--ca-green)' : 'transparent';
+      document.getElementById('currBtnUSDT').style.color = currency === 'USDT' ? '#000' : 'var(--ca-text-muted)';
+      
+      document.getElementById('currBtnINR').classList.toggle('active', currency === 'INR');
+      document.getElementById('currBtnINR').style.background = currency === 'INR' ? 'var(--ca-green)' : 'transparent';
+      document.getElementById('currBtnINR').style.color = currency === 'INR' ? '#000' : 'var(--ca-text-muted)';
+
+      window.stockwise?.toast(`Quote currency switched to: ${currency}`, 'success');
+
+      // Fetch prices immediately for new quote currency
+      fetchLivePrices().then(() => {
+        // Refresh portfolios and terminals
+        loadAccountData();
+        selectMarket(currentAsset);
+      });
+    }
+
+    function renderSidebarMarkets() {
+      const container = document.getElementById('sidebarMarketList');
+      if (!container) return;
+
+      const prefix = selectedCurrency === 'INR' ? '₹' : '$';
+
+      container.innerHTML = Object.entries(ASSETS).map(([sym, a]) => {
+        const isActive = currentAsset === sym ? 'active' : '';
+        const chgColor = a.change >= 0 ? 'var(--ca-green)' : 'var(--ca-red)';
+        const chgSign = a.change >= 0 ? '+' : '';
+        const dec = sym === 'SHIB' ? 6 : (sym === 'ADA' || sym === 'XRP' || a.price < 1 ? 4 : 2);
+        
+        return `
+          <div class="market-row ${isActive}" onclick="selectMarket('${sym}')" data-market="${sym}">
+            <div class="coin-ident">
+              <div class="coin-circle" style="background:${a.color}; color:${a.textClr}">${a.char}</div>
+              <div class="coin-details">
+                <span class="coin-symbol">${sym}</span>
+                <span class="coin-change" style="color:${chgColor}">${chgSign}${a.change.toFixed(2)}%</span>
+              </div>
+            </div>
+            <span class="market-price-col">${prefix}${a.price.toLocaleString('en-US', { maximumFractionDigits: dec, minimumFractionDigits: sym === 'SHIB' ? 6 : 2 })}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function fetchLivePrices() {
+      try {
+        if (selectedCurrency === 'USDT') {
+          // Fetch simple prices in USDT from CoinGecko
+          const gecko = await fetchUSDTGeckoPrices();
+          if (gecko) {
+            Object.entries(ASSETS).forEach(([sym, a]) => {
+              const cgId = a.cgId;
+              if (gecko[cgId]) {
+                a.basePrice = gecko[cgId].usd || a.basePrice;
+                a.price = a.basePrice;
+                a.change = gecko[cgId].usd_24h_change !== undefined ? gecko[cgId].usd_24h_change : a.change;
+              } else {
+                a.price = a.basePrice;
+              }
+            });
+          } else {
+            Object.values(ASSETS).forEach(a => { a.price = a.basePrice; });
+          }
+        } else {
+          // === INR MODE ===
+          // Step 1: First update USDT base prices from CoinGecko so tetherRate computation is accurate
+          const gecko = await fetchUSDTGeckoPrices();
+          if (gecko) {
+            Object.entries(ASSETS).forEach(([sym, a]) => {
+              if (gecko[a.cgId] && gecko[a.cgId].usd > 0) {
+                a.basePrice = gecko[a.cgId].usd;
+                a.change = gecko[a.cgId].usd_24h_change ?? a.change;
+              }
+            });
+          }
+
+          // Step 2: Compute REAL USD/INR rate using BTC price ratio (not CoinDCX's USDTINR which is exchange premium ~₹100)
+          await computeRealINRRate();
+
+          // Step 3: Fetch actual INR prices from CoinDCX per-coin pairs (BTCINR, ETHINR, etc.)
+          const dcx = await fetchINRDCXPrices();
+          if (dcx && dcx.length > 0) {
+            const map = {};
+            dcx.forEach(t => { if (t.symbol) map[t.symbol.toUpperCase()] = t; });
+
+            Object.entries(ASSETS).forEach(([sym, a]) => {
+              if (map[sym] && map[sym].current_price > 0) {
+                a.price  = map[sym].current_price;     // Real INR from CoinDCX — most accurate
+                a.basePrice = a.price / tetherRate;    // Back-compute USD baseline with real rate
+                a.change = map[sym].price_change_percentage_24h ?? a.change;
+              } else {
+                // Coin not listed on CoinDCX (e.g. MATIC/POL) — use real tetherRate
+                a.price = a.basePrice * tetherRate;
+              }
+            });
+          } else {
+            // CoinDCX totally unavailable: convert USDT prices with real rate
+            Object.values(ASSETS).forEach(a => { a.price = a.basePrice * tetherRate; });
+          }
+        }
+
+        // Render dynamic left side markets sidebar
+        renderSidebarMarkets();
+
+        // Update center header details
+        const prefix = selectedCurrency === 'INR' ? '₹' : '$';
+        const dec = currentAsset === 'SHIB' ? 6 : (currentAsset === 'ADA' || currentAsset === 'XRP' || ASSETS[currentAsset].price < 1 ? 4 : 2);
+        
+        const priceEl = document.getElementById('centerPairPrice');
+        if (priceEl) priceEl.textContent = prefix + ASSETS[currentAsset].price.toLocaleString('en-US', { maximumFractionDigits: dec, minimumFractionDigits: currentAsset === 'SHIB' ? 6 : 2 });
+        
+        const chgEl = document.getElementById('centerPairChg');
+        if (chgEl) {
+          chgEl.textContent = (ASSETS[currentAsset].change >= 0 ? '+' : '') + ASSETS[currentAsset].change.toFixed(2) + '%';
+          chgEl.style.color = ASSETS[currentAsset].change >= 0 ? 'var(--ca-green)' : 'var(--ca-red)';
+        }
+
+        // Redraw chart with latest prices
+        drawChart();
+
+        // Update order book
+        updateOrderBook();
+      } catch(e) { console.error('fetchLivePrices error:', e); }
+    }
+
+
+    // ─── SYNC USER TELEMETRY FROM EXPRESS SERVER ───
+    async function loadAccountData() {
+      try {
+        const res = await fetch('/api/demo/account', { credentials: 'include' });
+        if (!res.ok) {
+          // 401 = not logged in → run in full offline demo mode (no login required)
+          isLoggedIn = false;
+          renderDemoOffline();
+          drawChart();
+          return;
+        }
+
+        isLoggedIn = true;
+        const data = await res.json();
+        demoBalance = data.balance;
+        demoPortfolio = data.portfolio || [];
+        completedLessonsList = data.completedLessons || [];
+
+        // Set center strip price
+        const currentAssetData = ASSETS[currentAsset];
+        const prefix = selectedCurrency === 'INR' ? '₹' : '$';
+        const dec = currentAsset === 'SHIB' ? 6 : (currentAsset === 'ADA' || currentAsset === 'XRP' || ASSETS[currentAsset].price < 1 ? 4 : 2);
+        
+        if (currentAssetData) {
+          document.getElementById('centerPairPrice').textContent = prefix + currentAssetData.price.toLocaleString('en-US', { maximumFractionDigits: dec, minimumFractionDigits: currentAsset === 'SHIB' ? 6 : 2 });
+          document.getElementById('centerPairChg').textContent = (currentAssetData.change >= 0 ? '+' : '') + currentAssetData.change.toFixed(2) + '%';
+          document.getElementById('centerPairChg').style.color = currentAssetData.change >= 0 ? 'var(--ca-green)' : 'var(--ca-red)';
+        }
+
+        // Calculate Net Portfolio valuation
+        const displayBalance = selectedCurrency === 'INR' ? demoBalance * tetherRate : demoBalance;
+        let netValuation = displayBalance;
+        let holdingsHtml = '';
+
+        if (demoPortfolio.length > 0) {
+          holdingsHtml = demoPortfolio.map(row => {
+            const sym = row.symbol.toUpperCase();
+            const qty = row.quantity;
+            const avgBuy = row.avg_buy_price;
+            
+            // Database avgBuy is stored in USDT baseline, convert for rendering
+            const displayAvgBuy = selectedCurrency === 'INR' ? avgBuy * tetherRate : avgBuy;
+            const displayLivePrice = ASSETS[sym] ? ASSETS[sym].price : displayAvgBuy;
+            const currentVal = qty * displayLivePrice;
+            netValuation += currentVal;
+
+            const pnlDollars = currentVal - (qty * displayAvgBuy);
+            const pnlPct = ((displayLivePrice - displayAvgBuy) / displayAvgBuy) * 100;
+            const pnlClass = pnlDollars >= 0 ? 'profit' : 'loss';
+            const pnlSign = pnlDollars >= 0 ? '+' : '';
+
+            return `
+              <div class="micro-holding-row">
+                <span><strong>${sym}</strong> (${qty.toFixed(4)})</span>
+                <span class="pnl-pill ${pnlClass}">${pnlSign}${pnlPct.toFixed(1)}%</span>
+              </div>
+            `;
+          }).join('');
+        } else {
+          holdingsHtml = `<div class="neutral" style="font-size:0.78rem; text-align:center; padding:1rem 0;">No active practice holdings.</div>`;
+        }
+
+        // Render UI metrics
+        document.getElementById('headerNetVal').textContent = prefix + netValuation.toLocaleString('en-US', { minimumFractionDigits: 2 });
+        document.getElementById('tradesNetVal').textContent = prefix + netValuation.toLocaleString('en-US', { minimumFractionDigits: 2 });
+        document.getElementById('tradesCashVal').textContent = prefix + displayBalance.toLocaleString('en-US', { minimumFractionDigits: 2 });
+        document.getElementById('holdingsList').innerHTML = holdingsHtml;
+
+        // Render trade history ledger
+        const ledger = document.getElementById('tradesLedger');
+        if (data.trades && data.trades.length > 0) {
+          ledger.innerHTML = data.trades.slice(0, 15).map(t => {
+            const date = new Date(t.created_at).toLocaleTimeString();
+            
+            // Convert order prices dynamically for display
+            const displayPrice = selectedCurrency === 'INR' ? t.price * tetherRate : t.price;
+            const total = t.quantity * displayPrice;
+            const style = t.type === 'BUY' ? 'color:var(--ca-green)' : 'color:var(--ca-red)';
+            return `
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.01); padding-bottom:0.15rem;">
+                <span>${date} <strong>${t.symbol}</strong></span>
+                <span style="${style}">${t.type} ${t.quantity.toFixed(3)} (${prefix}${total.toFixed(0)})</span>
+              </div>
+            `;
+          }).join('');
+        } else {
+          ledger.innerHTML = `<div class="neutral" style="text-align:center; padding:1rem 0;">No practice logs.</div>`;
+        }
+
+        renderAcademy();
+        drawChart();
+      } catch (err) {
+        console.error('loadAccountData error:', err);
+        // On any error, still show the chart in offline mode
+        renderDemoOffline();
+        drawChart();
+      }
+    }
+
+    // ─── OFFLINE DEMO MODE (no login required) ───
+    // Persists demo state in localStorage so it survives page refresh
+    function getOfflineState() {
+      try {
+        const s = localStorage.getItem('ca_demo');
+        if (s) return JSON.parse(s);
+      } catch(e) {}
+      return { balance: 10000, portfolio: [], trades: [] };
+    }
+
+    function saveOfflineState(state) {
+      try { localStorage.setItem('ca_demo', JSON.stringify(state)); } catch(e) {}
+    }
+
+    function renderDemoOffline() {
+      const state = getOfflineState();
+      demoBalance = state.balance;
+      demoPortfolio = state.portfolio || [];
+
+      const prefix = selectedCurrency === 'INR' ? '₹' : '$';
+      const displayBalance = selectedCurrency === 'INR' ? demoBalance * tetherRate : demoBalance;
+      let netValuation = displayBalance;
+      let holdingsHtml = '';
+
+      if (demoPortfolio.length > 0) {
+        holdingsHtml = demoPortfolio.map(row => {
+          const sym = row.symbol.toUpperCase();
+          const qty = row.quantity;
+          const avgBuy = row.avg_buy_price;
+          
+          const displayAvgBuy = selectedCurrency === 'INR' ? avgBuy * tetherRate : avgBuy;
+          const displayLivePrice = ASSETS[sym] ? ASSETS[sym].price : displayAvgBuy;
+          const currentVal = qty * displayLivePrice;
+          netValuation += currentVal;
+          
+          const pnlPct = ((displayLivePrice - displayAvgBuy) / displayAvgBuy) * 100;
+          const pnlClass = pnlPct >= 0 ? 'profit' : 'loss';
+          return `
+            <div class="micro-holding-row">
+              <span><strong>${sym}</strong> (${qty.toFixed(4)})</span>
+              <span class="pnl-pill ${pnlClass}">${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(1)}%</span>
+            </div>`;
+        }).join('');
+      } else {
+        holdingsHtml = `<div class="neutral" style="font-size:0.78rem; text-align:center; padding:1rem 0;">No active practice holdings.<br><small style="opacity:0.5">Place your first demo trade!</small></div>`;
+      }
+
+      document.getElementById('headerNetVal').textContent = prefix + netValuation.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('tradesNetVal').textContent = prefix + netValuation.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('tradesCashVal').textContent = prefix + displayBalance.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('holdingsList').innerHTML = holdingsHtml;
+
+      const trades = state.trades || [];
+      const ledger = document.getElementById('tradesLedger');
+      if (trades.length > 0) {
+        ledger.innerHTML = trades.slice(-15).reverse().map(t => {
+          const style = t.type === 'BUY' ? 'color:var(--ca-green)' : 'color:var(--ca-red)';
+          
+          const displayPrice = selectedCurrency === 'INR' ? t.price * tetherRate : t.price;
+          const total = t.quantity * displayPrice;
+          return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.01); padding-bottom:0.15rem;">
+            <span>${t.time} <strong>${t.symbol}</strong></span>
+            <span style="${style}">${t.type} ${t.quantity.toFixed(3)} (${prefix}${total.toFixed(0)})</span>
+          </div>`;
+        }).join('');
+      } else {
+        ledger.innerHTML = `<div class="neutral" style="text-align:center; padding:1rem 0;">No practice logs yet.</div>`;
+      }
+
+    }
+
+    // ─── CHOOSE ACTIVE CRYPTO ASSET ───
+    function selectMarket(coin) {
+      currentAsset = coin;
+      document.querySelectorAll('.market-row').forEach(row => {
+        row.classList.toggle('active', row.dataset.market === coin);
+      });
+
+      // Update Center header
+      document.getElementById('centerPairTitle').textContent = `${coin}/USDT`;
+      
+      // Update terminals inputs
+      document.getElementById('buyQtyUnit').textContent = coin;
+      document.getElementById('sellQtyUnit').textContent = coin;
+
+      // Update Terminal pricing default values
+      const currentPrice = ASSETS[coin].price;
+      document.getElementById('buyPrice').value = currentPrice.toFixed(coin === 'ADA' || coin === 'XRP' ? 4 : 2);
+      document.getElementById('sellPrice').value = currentPrice.toFixed(coin === 'ADA' || coin === 'XRP' ? 4 : 2);
+      document.getElementById('buyQty').value = '';
+      document.getElementById('sellQty').value = '';
+
+      // Draw custom canvas
+      fetchAndRedrawChart();
+
+      // Update order book
+      updateOrderBook();
+    }
+
+    // ─── TOGGLE CHART INDICATORS ───
+    function toggleIndicator(ind) {
+      activeIndicators[ind] = !activeIndicators[ind];
+      refreshIndicatorUI();
+      if (historicalKlines) {
+        refreshIndicatorsData(historicalKlines);
+      }
+    }
+
+    function refreshIndicatorUI() {
+      Object.keys(activeIndicators).forEach(ind => {
+        const btn = document.getElementById(`ind-${ind}`);
+        if (btn) btn.classList.toggle('active', activeIndicators[ind]);
+      });
+    }
+
+    function fetchAndRedrawChart() {
+      fetchHistoricalCandles();
+    }
+
+    function drawChart() {
+      // Helper function that acts as a safe update/sync callback for Lightweight Charts
+      if (!chartWidget || !historicalKlines || !historicalKlines.length || !candleSeries) return;
+      
+      const last = historicalKlines[historicalKlines.length - 1];
+      const coin = currentAsset;
+      const currentData = ASSETS[coin];
+      if (!currentData || !last) return;
+      
+      const currentPrice = currentData.price;
+      
+      // Update last candlestick values with currentAsset price
+      last.close = currentPrice;
+      if (currentPrice > last.high) last.high = currentPrice;
+      if (currentPrice < last.low) last.low = currentPrice;
+      
+      candleSeries.update({
+        time: last.time,
+        open: last.open,
+        high: last.high,
+        low: last.low,
+        close: last.close
+      });
+      
+      if (lineSeries) {
+        lineSeries.update({
+          time: last.time,
+          value: last.close
+        });
+      }
+      
+      if (volumeSeries) {
+        volumeSeries.update({
+          time: last.time,
+          value: last.volume,
+          color: last.close >= last.open ? 'rgba(14, 203, 129, 0.4)' : 'rgba(246, 70, 93, 0.4)'
+        });
+      }
+      
+      // Update OHLC HUD with the revised price
+      drawHUDItems(last);
+    }
+
+    // ─── TRADINGVIEW LIGHTWEIGHT CHARTS IMPLEMENTATION ───
+    let historicalKlines = []; // Stores baseline formatted candles (time, open, high, low, close, volume)
+
+    function initLightweightChart() {
+      const container = document.getElementById('lightweightChartContainer');
+      if (!container) return;
+      if (typeof LightweightCharts === 'undefined') {
+        console.error('LightweightCharts library not loaded!');
+        return;
+      }
+      if (chartWidget) return; // already initialized
+
+      // Ensure container has a measured height
+      const width = container.clientWidth || 800;
+      const height = container.clientHeight || 420;
+
+      // Create professional Lightweight Chart
+      chartWidget = LightweightCharts.createChart(container, {
+        width: width,
+        height: height,
+        layout: {
+          background: { type: 'solid', color: '#121212' },
+          textColor: '#B4B4B4',
+          fontFamily: "'Inter', sans-serif",
+        },
+        grid: {
+          vertLines: { color: '#262626' },
+          horzLines: { color: '#262626' },
+        },
+        crosshair: {
+          mode: LightweightCharts.CrosshairMode.Normal,
+          vertLine: {
+            color: '#8E8E93',
+            width: 1,
+            style: 2, // dashed
+          },
+          horzLine: {
+            color: '#8E8E93',
+            width: 1,
+            style: 2, // dashed
+          },
+        },
+        rightPriceScale: {
+          borderColor: '#262626',
+          visible: true,
+        },
+        timeScale: {
+          borderColor: '#262626',
+          timeVisible: true,
+          secondsVisible: false,
+        },
+      });
+
+      // Add Candlestick Series
+      candleSeries = chartWidget.addCandlestickSeries({
+        upColor: '#0ecb81',
+        downColor: '#f6465d',
+        borderUpColor: '#0ecb81',
+        borderDownColor: '#f6465d',
+        wickUpColor: '#0ecb81',
+        wickDownColor: '#f6465d',
+      });
+
+      // Add Line Series (for Line mode)
+      lineSeries = chartWidget.addLineSeries({
+        color: '#3b82f6',
+        lineWidth: 2,
+        visible: false,
+      });
+
+      // Add Technical Line Indicators
+      ema20Series = chartWidget.addLineSeries({
+        color: '#ffd32a', // golden yellow
+        lineWidth: 1.5,
+        title: 'EMA 20',
+      });
+
+      ema50Series = chartWidget.addLineSeries({
+        color: '#a78bfa', // pastel purple
+        lineWidth: 1.5,
+        title: 'EMA 50',
+      });
+
+      bbUpperSeries = chartWidget.addLineSeries({
+        color: '#3b82f6', // corporate blue upper band
+        lineWidth: 1.2,
+        lineStyle: 2, // dashed
+      });
+
+      bbLowerSeries = chartWidget.addLineSeries({
+        color: '#3b82f6', // corporate blue lower band
+        lineWidth: 1.2,
+        lineStyle: 2, // dashed
+      });
+
+      // Add Volume Histogram Series on a separate sub-pane inside the chart
+      volumeSeries = chartWidget.addHistogramSeries({
+        color: '#26a69a',
+        priceFormat: {
+          type: 'volume',
+        },
+        priceScaleId: 'volume_scale',
+      });
+
+      chartWidget.priceScale('volume_scale').applyOptions({
+        scaleMargins: {
+          top: 0.8, // volume bars occupy bottom 20% of chart
+          bottom: 0,
+        },
+      });
+
+      // Create resize observer to handle layout resizing dynamically
+      const resizeObserver = new ResizeObserver(entries => {
+        if (entries.length === 0 || !chartWidget) return;
+        const { width, height } = entries[0].contentRect;
+        chartWidget.resize(width, height || 420);
+      });
+      resizeObserver.observe(container);
+
+      // Handle Crosshair Mouseover tooltips and Canvas HUD updates
+      chartWidget.subscribeCrosshairMove(param => {
+        updateChartHUD(param);
+      });
+    }
+
+    // ─── OHLC HUD FLOATING DATA UPDATE ───
+    function updateChartHUD(param) {
+      if (!param || !param.time || param.point === undefined || !historicalKlines.length) {
+        // Fall back to showing the latest candle data
+        const latest = historicalKlines[historicalKlines.length - 1];
+        if (latest) {
+          drawHUDItems(latest);
+        }
+        return;
+      }
+
+      // Find the candle corresponding to hovered time
+      const time = param.time;
+      const candle = historicalKlines.find(k => k.time === time);
+      if (candle) {
+        drawHUDItems(candle);
+      }
+    }
+
+    function drawHUDItems(candle) {
+      const dec = currentAsset === 'SHIB' ? 6 : (currentAsset === 'ADA' || currentAsset === 'XRP' || candle.close < 1 ? 4 : 2);
+      const prefix = selectedCurrency === 'INR' ? '₹' : '$';
+      const isBull = candle.close >= candle.open;
+      const colorClass = isBull ? 'chg-up' : 'chg-down';
+      const colorVal = isBull ? 'var(--ca-green)' : 'var(--ca-red)';
+
+      const titleEl = document.getElementById('centerPairTitle');
+      if (titleEl) titleEl.innerHTML = `${currentAsset}/${selectedCurrency} <span style="font-family:'Roboto Mono',monospace; font-size:0.75rem; font-weight:600; margin-left:1rem; color:#787b86;">O <span style="color:${colorVal};">${prefix}${candle.open.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec })}</span> H <span style="color:${colorVal};">${prefix}${candle.high.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec })}</span> L <span style="color:${colorVal};">${prefix}${candle.low.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec })}</span> C <span style="color:${colorVal};">${prefix}${candle.close.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec })}</span> Vol <span style="color:#e5e5ea;">${candle.volume.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span></span>`;
+    }
+
+    // ─── FETCH DYNAMIC HISTORICAL DATA FEED ───
+    async function fetchHistoricalCandles() {
+      disconnectWebSocket();
+
+      const symbol = `${currentAsset}USDT`;
+      const interval = chartTimeframe === '1d' ? '1d' : chartTimeframe === '4h' ? '4h' : '1h';
+      const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=500`;
+
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("REST Load Error");
+
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          historicalKlines = data.map(c => {
+            const timeSeconds = Math.floor(c[0] / 1000);
+            let open = parseFloat(c[1]);
+            let high = parseFloat(c[2]);
+            let low = parseFloat(c[3]);
+            let close = parseFloat(c[4]);
+            let volume = parseFloat(c[5]);
+
+            // INR Quote Scale Conversion
+            if (selectedCurrency === 'INR') {
+              open *= tetherRate;
+              high *= tetherRate;
+              low *= tetherRate;
+              close *= tetherRate;
+            }
+
+            return {
+              time: timeSeconds,
+              open,
+              high,
+              low,
+              close,
+              volume,
+            };
+          });
+
+          // Sort chronologically ascending just in case
+          historicalKlines.sort((a, b) => a.time - b.time);
+
+          // Populate TV Lightweight Series
+          if (!chartWidget) {
+            initLightweightChart();
+          }
+
+          // Configure Active Modes
+          candleSeries.applyOptions({ visible: chartMode === 'candle' });
+          lineSeries.applyOptions({ visible: chartMode === 'line' });
+
+          const chartData = historicalKlines.map(k => ({
+            time: k.time,
+            open: k.open,
+            high: k.high,
+            low: k.low,
+            close: k.close,
+          }));
+
+          const lineData = historicalKlines.map(k => ({
+            time: k.time,
+            value: k.close,
+          }));
+
+          const volData = historicalKlines.map(k => {
+            const isBull = k.close >= k.open;
+            return {
+              time: k.time,
+              value: k.volume,
+              color: isBull ? 'rgba(14, 203, 129, 0.4)' : 'rgba(246, 70, 93, 0.4)',
+            };
+          });
+
+          candleSeries.setData(chartData);
+          lineSeries.setData(lineData);
+          volumeSeries.setData(volData);
+
+          // Populate Technical Overlays
+          refreshIndicatorsData(historicalKlines);
+
+          // Fit chart content on first load
+          chartWidget.timeScale().fitContent();
+
+          // Connect Active WebSocket kline updates
+          connectLiveWebSocket(symbol.toLowerCase(), interval);
+        }
+      } catch (err) {
+        console.error("fetchHistoricalCandles failed, reverting to seeded simulation:", err);
+        loadSeededSimulation();
+      }
+    }
+
+    // ─── MATHEMATICAL INDICATOR CALCULATIONS ───
+    function refreshIndicatorsData(klines) {
+      if (!candleSeries) return;
+
+      // 1. EMA Averages
+      if (activeIndicators.ema && klines.length > 20) {
+        const ema20 = calculateEMA(klines, 20);
+        const ema55 = calculateEMA(klines, 50);
+        ema20Series.setData(ema20);
+        ema50Series.setData(ema55);
+      } else {
+        ema20Series.setData([]);
+        ema50Series.setData([]);
+      }
+
+      // 2. Bollinger Bands
+      if (activeIndicators.bb && klines.length > 20) {
+        const bb = calculateBollingerBands(klines, 20, 2);
+        bbUpperSeries.setData(bb.upper);
+        bbLowerSeries.setData(bb.lower);
+      } else {
+        bbUpperSeries.setData([]);
+        bbLowerSeries.setData([]);
+      }
+    }
+
+    function calculateEMA(data, period) {
+      const k = 2 / (period + 1);
+      let ema = [];
+      let prevEma = null;
+
+      for (let i = 0; i < data.length; i++) {
+        const time = data[i].time;
+        const val = data[i].close;
+
+        if (i < period - 1) {
+          continue;
+        } else if (i === period - 1) {
+          const sum = data.slice(0, period).reduce((s, d) => s + d.close, 0);
+          prevEma = sum / period;
+          ema.push({ time, value: prevEma });
+        } else {
+          const curEma = (val - prevEma) * k + prevEma;
+          prevEma = curEma;
+          ema.push({ time, value: curEma });
+        }
+      }
+      return ema;
+    }
+
+    function calculateBollingerBands(data, period, multiplier) {
+      let upper = [];
+      let lower = [];
+
+      for (let i = 0; i < data.length; i++) {
+        if (i < period - 1) continue;
+        const slice = data.slice(i - period + 1, i + 1);
+        const sma = slice.reduce((s, d) => s + d.close, 0) / period;
+        const variance = slice.reduce((s, d) => s + Math.pow(d.close - sma, 2), 0) / period;
+        const stdDev = Math.sqrt(variance);
+
+        upper.push({ time: data[i].time, value: sma + multiplier * stdDev });
+        lower.push({ time: data[i].time, value: sma - multiplier * stdDev });
+      }
+      return { upper, lower };
+    }
+
+    // ─── WEBSOCKET REAL-TIME TICKER STREAM ───
+    function connectLiveWebSocket(symbol, interval) {
+      disconnectWebSocket();
+
+      const wsUrl = `wss://stream.binance.com:9443/ws/${symbol}@kline_${interval}`;
+      activeWsConnection = new WebSocket(wsUrl);
+
+      activeWsConnection.onmessage = e => {
+        try {
+          const msg = JSON.parse(e.data);
+          if (msg && msg.k) {
+            const k = msg.k;
+            const timeSeconds = Math.floor(k.t / 1000);
+            let open = parseFloat(k.o);
+            let high = parseFloat(k.h);
+            let low = parseFloat(k.l);
+            let close = parseFloat(k.c);
+            let volume = parseFloat(k.v);
+
+            // Apply active quote conversion
+            if (selectedCurrency === 'INR') {
+              open *= tetherRate;
+              high *= tetherRate;
+              low *= tetherRate;
+              close *= tetherRate;
+            }
+
+            const isClosed = k.x; // checks if kline candle frame fully completed
+            
+            // Real-time update payload
+            const updateObj = {
+              time: timeSeconds,
+              open,
+              high,
+              low,
+              close,
+            };
+
+            const volUpdateObj = {
+              time: timeSeconds,
+              value: volume,
+              color: close >= open ? 'rgba(14, 203, 129, 0.4)' : 'rgba(246, 70, 93, 0.4)',
+            };
+
+            // Feed update wicks smoothly into TV Lightweight Series
+            if (candleSeries) candleSeries.update(updateObj);
+            if (lineSeries) lineSeries.update({ time: timeSeconds, value: close });
+            if (volumeSeries) volumeSeries.update(volUpdateObj);
+
+            // Overwrite final candle in our array
+            const idx = historicalKlines.findIndex(item => item.time === timeSeconds);
+            if (idx !== -1) {
+              historicalKlines[idx] = { time: timeSeconds, open, high, low, close, volume };
+            } else {
+              historicalKlines.push({ time: timeSeconds, open, high, low, close, volume });
+              if (historicalKlines.length > 600) historicalKlines.shift();
+            }
+
+            // Sync dynamic overlays on close ticks
+            if (isClosed) {
+              refreshIndicatorsData(historicalKlines);
+            }
+
+            // Synchronize price ticks across core HUD metrics
+            const coinData = ASSETS[currentAsset];
+            if (coinData) {
+              coinData.price = close;
+            }
+
+            const prefix = selectedCurrency === 'INR' ? '₹' : '$';
+            const dec = currentAsset === 'SHIB' ? 6 : (currentAsset === 'ADA' || currentAsset === 'XRP' || close < 1 ? 4 : 2);
+            
+            const priceEl = document.getElementById('centerPairPrice');
+            if (priceEl) priceEl.textContent = prefix + close.toLocaleString('en-US', { maximumFractionDigits: dec, minimumFractionDigits: dec });
+
+            // Synchronize Order Book wiggles in real-time
+            updateOrderBook();
+          }
+        } catch (err) {
+          console.error("WS parse error:", err);
+        }
+      };
+
+      activeWsConnection.onerror = err => {
+        console.error("WebSocket stream error:", err);
+      };
+
+      activeWsConnection.onclose = () => {
+        console.log("WebSocket stream closed successfully.");
+      };
+    }
+
+    function disconnectWebSocket() {
+      if (activeWsConnection) {
+        activeWsConnection.close();
+        activeWsConnection = null;
+      }
+    }
+
+    // ─── OFFLINE SIMULATION FALLBACK ───
+    function loadSeededSimulation() {
+      // Graceful offline simulation fallback when Binance APIs are blocked or offline
+      historicalKlines = [];
+      const base = ASSETS[currentAsset].price;
+      const dataPoints = chartTimeframe === '1d' ? 30 : chartTimeframe === '4h' ? 42 : 60;
+      const seed = currentAsset.charCodeAt(0) + currentAsset.charCodeAt(1);
+      let rng = seed;
+      function seededRandom() {
+        rng = (rng * 9301 + 49297) % 233280;
+        return rng / 233280;
+      }
+
+      let seededVal = base * (0.95 + seededRandom() * 0.05);
+      const nowSeconds = Math.floor(Date.now() / 1000) - (dataPoints * 60);
+
+      for (let i = 0; i < dataPoints; i++) {
+        const time = nowSeconds + (i * 60);
+        const momentum = i > dataPoints * 0.7 ? 0.001 : -0.0005;
+        const noise = (seededRandom() - 0.5) * 0.015;
+        seededVal = seededVal * (1 + momentum + noise);
+
+        const open = seededVal * (1 + (seededRandom() - 0.5) * 0.003);
+        const close = seededVal;
+        const high = Math.max(open, close) * (1 + seededRandom() * 0.005);
+        const low = Math.min(open, close) * (1 - seededRandom() * 0.005);
+        const volume = Math.floor(seededRandom() * 100) + 50;
+
+        historicalKlines.push({ time, open, high, low, close, volume });
+      }
+
+      if (!chartWidget) {
+        initLightweightChart();
+      }
+
+      const chartData = historicalKlines.map(k => ({
+        time: k.time,
+        open: k.open,
+        high: k.high,
+        low: k.low,
+        close: k.close,
+      }));
+
+      candleSeries.setData(chartData);
+      refreshIndicatorsData(historicalKlines);
+      chartWidget.timeScale().fitContent();
+    }
+
+    // ─── EXECUTE TERMINAL TRADE ORDER ───
+    async function executePracticeTrade(side) {
+      const qtyInput = document.getElementById(side === 'BUY' ? 'buyQty' : 'sellQty');
+      const prcInput = document.getElementById(side === 'BUY' ? 'buyPrice' : 'sellPrice');
+
+      const qty = parseFloat(qtyInput.value);
+      const price = parseFloat(prcInput.value); // In display currency (INR or USDT)
+
+      if (isNaN(qty) || qty <= 0 || isNaN(price) || price <= 0) {
+        showToast('Please enter a valid quantity & price.', 'error');
+        return;
+      }
+
+      // Convert prices dynamically to USDT baseline for calculations/storage/server
+      const priceUsdt = selectedCurrency === 'INR' ? price / tetherRate : price;
+      const totalCostUsdt = qty * priceUsdt;
+      const displayTotalCost = qty * price;
+      
+      const prefix = selectedCurrency === 'INR' ? '₹' : '$';
+      const secondaryPrefix = selectedCurrency === 'INR' ? '$' : '₹';
+      const secondaryTotalCost = selectedCurrency === 'INR' ? totalCostUsdt : totalCostUsdt * tetherRate;
+
+      if (isLoggedIn) {
+        // ── Logged-in: use server API ──
+        try {
+          const res = await fetch('/api/demo/trade', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ symbol: currentAsset, type: side, quantity: qty, price: priceUsdt }),
+            credentials: 'include'
+          });
+          const data = await res.json();
+          if (data.error) {
+            showToast(data.error, 'error');
+            appendCoachMsg('bot', `⚠️ <strong>Order Failed:</strong> ${data.error}.`);
+          } else {
+            showToast(`${side} order filled! Practice balance updated.`, 'success');
+            qtyInput.value = '';
+            appendCoachMsg('bot', `🟢 <strong>Order filled:</strong> ${side} ${qty.toFixed(4)} ${currentAsset} @ ${prefix}${price.toLocaleString()} (${secondaryPrefix}${secondaryTotalCost.toLocaleString('en-US', {maximumFractionDigits:2})}).`);
+            await loadAccountData();
+          }
+        } catch(err) { console.error(err); }
+      } else {
+        // ── Offline demo mode ──
+        const state = getOfflineState();
+        if (side === 'BUY') {
+          if (state.balance < totalCostUsdt) {
+            showToast('Insufficient demo balance!', 'error');
+            appendCoachMsg('bot', '⚠️ <strong>Order Failed:</strong> Insufficient virtual USDT balance. Try a smaller quantity.');
+            return;
+          }
+          state.balance = parseFloat((state.balance - totalCostUsdt).toFixed(4));
+          const existing = state.portfolio.find(p => p.symbol === currentAsset);
+          if (existing) {
+            const totalQty = existing.quantity + qty;
+            existing.avg_buy_price = ((existing.avg_buy_price * existing.quantity) + (priceUsdt * qty)) / totalQty;
+            existing.quantity = totalQty;
+          } else {
+            state.portfolio.push({ symbol: currentAsset, quantity: qty, avg_buy_price: priceUsdt });
+          }
+        } else {
+          const holding = state.portfolio.find(p => p.symbol === currentAsset);
+          if (!holding || holding.quantity < qty) {
+            showToast('Insufficient holdings to sell!', 'error');
+            appendCoachMsg('bot', `⚠️ <strong>Order Failed:</strong> You don't have enough ${currentAsset} to sell. Buy some first.`);
+            return;
+          }
+          state.balance = parseFloat((state.balance + totalCostUsdt).toFixed(4));
+          holding.quantity -= qty;
+          if (holding.quantity < 0.0001) state.portfolio = state.portfolio.filter(p => p.symbol !== currentAsset);
+        }
+        const now = new Date();
+        state.trades = state.trades || [];
+        state.trades.push({ type: side, symbol: currentAsset, quantity: qty, price: priceUsdt, time: now.toLocaleTimeString() });
+        saveOfflineState(state);
+        demoBalance = state.balance;
+        demoPortfolio = state.portfolio;
+
+        qtyInput.value = '';
+        showToast(`${side} ${qty.toFixed(4)} ${currentAsset} @ ${prefix}${price.toLocaleString()} — Demo order filled! 🎉`, 'success');
+        appendCoachMsg('bot', `🟢 <strong>Demo Trade Executed:</strong> ${side} of ${qty.toFixed(4)} ${currentAsset} at ${prefix}${price.toLocaleString()} (${secondaryPrefix}${secondaryTotalCost.toLocaleString('en-US', {maximumFractionDigits:2})}). Your practice balance is now ${prefix}${(selectedCurrency === 'INR' ? state.balance * tetherRate : state.balance).toLocaleString('en-US', {maximumFractionDigits:2})}.`);
+        renderDemoOffline();
+      }
+    }
+
+    // Simple toast helper (fallback if main.js toast not available)
+    function showToast(msg, type) {
+      if (window.stockwise?.toast) {
+        window.stockwise.toast(msg, type);
+        return;
+      }
+      // Fallback inline toast
+      const t = document.createElement('div');
+      t.textContent = msg;
+      t.style.cssText = `position:fixed;bottom:2rem;right:2rem;z-index:9999;padding:0.75rem 1.25rem;border-radius:10px;font-family:'IBM Plex Mono',monospace;font-size:0.8rem;font-weight:700;transition:all 0.3s;box-shadow:0 8px 32px rgba(0,0,0,0.4);${
+        type === 'error' ? 'background:#1a0a0a;border:1px solid #ff4757;color:#ff4757;' : 'background:#051a12;border:1px solid #00e5a0;color:#00e5a0;'
+      }`;
+      document.body.appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2800);
+    }
+
+    // RESET ENTIRE PRACTICING ACCOUNT
+    async function resetPracticeAccount() {
+      if (!confirm('Reset your practice account to $10,000 USDT? All virtual trades & holdings will be cleared.')) return;
+      if (isLoggedIn) {
+        try {
+          const res = await fetch('/api/demo/reset', { method: 'POST', credentials: 'include' });
+          if (res.ok) {
+            showToast('Practice account reset to $10,000 USDT!', 'success');
+            appendCoachMsg('bot', `🔄 <strong>Account Reset:</strong> $10,000 USDT restored. Start fresh!`);
+            await loadAccountData();
+          }
+        } catch(err) { console.error(err); }
+      } else {
+        // Offline reset
+        saveOfflineState({ balance: 10000, portfolio: [], trades: [] });
+        demoBalance = 10000;
+        demoPortfolio = [];
+        renderDemoOffline();
+        showToast('Demo account reset to $10,000 USDT!', 'success');
+        appendCoachMsg('bot', `🔄 <strong>Demo Reset:</strong> Your $10,000 virtual funds have been restored. Ready to practice again!`);
+      }
+    }
+
+    // ─── TABS PANEL SWITCHING: LEARN (ACADEMY) vs TRADE (ARENA) ───
+    function switchNavPane(pane) {
+      document.getElementById('tabBtnTrade').classList.toggle('active', pane === 'trade');
+      document.getElementById('tabBtnLearn').classList.toggle('active', pane === 'learn');
+      
+      document.getElementById('paneTradeApp').style.display = pane === 'trade' ? 'grid' : 'none';
+      document.getElementById('paneLearnApp').style.display = pane === 'learn' ? 'flex' : 'none';
+      
+      if (pane === 'trade') {
+        setTimeout(() => {
+          if (chartWidget) {
+            const container = document.getElementById('lightweightChartContainer');
+            if (container) {
+              chartWidget.resize(container.clientWidth, container.clientHeight || 420);
+            }
+          }
+          drawChart();
+        }, 150);
+      }
+    }
+
+    function switchRightTab(tab) {
+      const tabs = ['orderbook', 'coach', 'trades', 'bots'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`rightTabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
+        const pane = document.getElementById(`rightPane${t.charAt(0).toUpperCase() + t.slice(1)}`);
+        if (btn) btn.classList.toggle('active', t === tab);
+        if (pane) pane.classList.toggle('active', t === tab);
+      });
+
+      if (tab === 'bots') {
+        loadBots();
+      }
+      if (tab === 'orderbook') {
+        updateOrderBook();
+      }
+    }
+
+    // ─── BOTS CONFIGURATOR FUNCTIONS ───
+    function adjustStrategyParams() {
+      const strat = document.getElementById('botStrategy').value;
+      const container = document.getElementById('strategyParams');
+      if (strat === 'RSI') {
+        container.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; font-size:0.72rem;">
+            <span>RSI Buy Threshold:</span>
+            <input type="number" id="paramRsiBuy" value="35" min="5" max="95" style="width:48px; background:rgba(255,255,255,0.02); border:1px solid var(--ca-border); text-align:center; color:#fff; border-radius:4px; padding:2px; font-family:inherit; font-size:0.72rem;">
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.72rem;">
+            <span>RSI Sell Threshold:</span>
+            <input type="number" id="paramRsiSell" value="65" min="5" max="95" style="width:48px; background:rgba(255,255,255,0.02); border:1px solid var(--ca-border); text-align:center; color:#fff; border-radius:4px; padding:2px; font-family:inherit; font-size:0.72rem;">
+          </div>
+        `;
+      } else if (strat === 'MACD') {
+        container.innerHTML = `
+          <div style="font-size:0.72rem; color:var(--ca-text-muted); line-height:1.4;">
+            ℹ️ MACD Strategy automatically monitors MACD line crossovers above/below signal line. No parameters needed.
+          </div>
+        `;
+      } else if (strat === 'Grid') {
+        container.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.72rem;">
+            <span>Grid Dev Margin (%):</span>
+            <input type="number" id="paramGridPercent" value="1.5" min="0.1" max="10" step="0.1" style="width:48px; background:rgba(255,255,255,0.02); border:1px solid var(--ca-border); text-align:center; color:#fff; border-radius:4px; padding:2px; font-family:inherit; font-size:0.72rem;">
+          </div>
+        `;
+      }
+    }
+
+    async function loadBots() {
+      // Clear active console update intervals
+      Object.keys(botLogsIntervals).forEach(id => {
+        clearInterval(botLogsIntervals[id]);
+      });
+      botLogsIntervals = {};
+
+      if (isLoggedIn) {
+        try {
+          const res = await fetch('/api/demo/bots', { credentials: 'include' });
+          if (!res.ok) throw new Error();
+          activeBotsList = await res.json();
+        } catch (e) {
+          activeBotsList = [];
+        }
+      } else {
+        const state = JSON.parse(localStorage.getItem('ca_offline_bots') || '[]');
+        activeBotsList = state;
+      }
+
+      renderBotsList();
+    }
+
+    function renderBotsList() {
+      const container = document.getElementById('botsListContainer');
+      const badge = document.getElementById('botCountBadge');
+      
+      badge.textContent = `${activeBotsList.length}/5`;
+
+      if (activeBotsList.length === 0) {
+        container.innerHTML = `
+          <div class="neutral" style="text-align:center; padding:1.5rem 0; font-size:0.78rem; color:var(--ca-text-muted);">
+            No active simulated bots.<br><small style="opacity:0.6">Deploy a script above to start simulation.</small>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = activeBotsList.map(bot => {
+        const statusClass = bot.status === 'active' ? 'active' : 'paused';
+        const toggleText = bot.status === 'active' ? 'Pause' : 'Activate';
+        let params = {};
+        try { params = typeof bot.parameters_json === 'string' ? JSON.parse(bot.parameters_json) : bot.parameters_json || {}; } catch(e){}
+
+        let paramText = '';
+        if (bot.strategy === 'RSI_BOT') {
+          paramText = `RSI: ${params.buy_threshold || 35}/${params.sell_threshold || 65}`;
+        } else if (bot.strategy === 'GRID_BOT') {
+          paramText = `Grid: ${params.grid_percent || 1.5}%`;
+        } else {
+          paramText = 'Auto MACD';
+        }
+
+        return `
+          <div class="bot-card" id="botCard-${bot.id}" style="margin-bottom:0.4rem;">
+            <div class="bot-card-header">
+              <span class="bot-card-title">${bot.name}</span>
+              <span class="bot-status-badge ${statusClass}">
+                <span class="status-dot"></span>${bot.status}
+              </span>
+            </div>
+            <div class="bot-card-meta">
+              <span>Pair: <strong>${bot.symbol}/USDT</strong></span>
+              <span>${paramText}</span>
+            </div>
+            
+            <!-- Collapsible Logs Console -->
+            <div class="bot-logs-console" id="botLogsConsole-${bot.id}">
+              <div style="font-size:0.65rem; opacity:0.5;">Awaiting telemetry telemetry streams...</div>
+            </div>
+
+            <div class="bot-card-actions">
+              <button class="bot-action-btn" onclick="toggleBot(${bot.id}, '${bot.status === 'active' ? 'paused' : 'active'}')">
+                ${toggleText}
+              </button>
+              <button class="bot-action-btn delete" onclick="deleteBot(${bot.id})">
+                Delete
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Launch individual intervals to update logs for active bots
+      activeBotsList.forEach(bot => {
+        updateBotConsole(bot.id);
+        botLogsIntervals[bot.id] = setInterval(() => updateBotConsole(bot.id), 8000);
+      });
+    }
+
+    async function updateBotConsole(botId) {
+      const consoleEl = document.getElementById(`botLogsConsole-${botId}`);
+      if (!consoleEl) return;
+
+      let logs = [];
+      if (isLoggedIn) {
+        try {
+          const res = await fetch(`/api/demo/bots/logs?botId=${botId}`, { credentials: 'include' });
+          if (res.ok) logs = await res.json();
+        } catch(e){}
+      } else {
+        const allLogs = JSON.parse(localStorage.getItem('ca_offline_bot_logs') || '{}');
+        logs = allLogs[botId] || [];
+      }
+
+      if (logs.length === 0) {
+        consoleEl.innerHTML = `<div style="font-size:0.65rem; opacity:0.4;">Monitoring market feeds. Standing by...</div>`;
+        return;
+      }
+
+      consoleEl.innerHTML = logs.slice(0, 15).map(log => {
+        const date = log.created_at ? new Date(log.created_at).toLocaleTimeString() : new Date().toLocaleTimeString();
+        return `<div><span style="color:#64748b;">[${date}]</span> ${log.message}</div>`;
+      }).join('');
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    async function createTradingBot() {
+      const nameInput = document.getElementById('botName');
+      const stratSelect = document.getElementById('botStrategy');
+      const pairSelect = document.getElementById('botSymbol');
+
+      const name = nameInput.value.trim();
+      const strategy = stratSelect.value;
+      const symbol = pairSelect.value;
+
+      if (!name) {
+        window.stockwise?.toast('Please enter a name for your bot script.', 'error');
+        return;
+      }
+
+      if (activeBotsList.length >= 5) {
+        window.stockwise?.toast('Maximum limit of 5 simulated bots reached. Delete an existing bot first.', 'error');
+        return;
+      }
+
+      const backendStrategy = strategy === 'RSI' ? 'RSI_BOT' : (strategy === 'MACD' ? 'MACD_BOT' : 'GRID_BOT');
+      
+      let parameters = {};
+      if (strategy === 'RSI') {
+        const buy = parseInt(document.getElementById('paramRsiBuy').value) || 35;
+        const sell = parseInt(document.getElementById('paramRsiSell').value) || 65;
+        parameters = { buy_threshold: buy, sell_threshold: sell };
+      } else if (strategy === 'Grid') {
+        const grid = parseFloat(document.getElementById('paramGridPercent').value) || 1.5;
+        parameters = { grid_percent: grid };
+      }
+
+      if (isLoggedIn) {
+        try {
+          const res = await fetch('/api/demo/bots/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, strategy: backendStrategy, symbol, parameters }),
+            credentials: 'include'
+          });
+          const data = await res.json();
+          if (data.error) {
+            window.stockwise?.toast(data.error, 'error');
+          } else {
+            window.stockwise?.toast(`Bot script "${name}" successfully deployed! 🤖`, 'success');
+            nameInput.value = '';
+            await loadBots();
+          }
+        } catch(e){
+          console.error(e);
+        }
+      } else {
+        // Offline bot creation
+        const bots = JSON.parse(localStorage.getItem('ca_offline_bots') || '[]');
+        const newId = Date.now();
+        const newBot = {
+          id: newId,
+          name,
+          strategy: backendStrategy,
+          symbol,
+          status: 'active',
+          parameters_json: JSON.stringify(parameters),
+          created_at: new Date().toISOString()
+        };
+        bots.push(newBot);
+        localStorage.setItem('ca_offline_bots', JSON.stringify(bots));
+
+        // Add initial log
+        const allLogs = JSON.parse(localStorage.getItem('ca_offline_bot_logs') || '{}');
+        allLogs[newId] = [{
+          message: `Bot ${name} initialized. Strategy: ${backendStrategy}. Trading: ${symbol}/USDT.`,
+          created_at: new Date().toISOString()
+        }];
+        localStorage.setItem('ca_offline_bot_logs', JSON.stringify(allLogs));
+
+        window.stockwise?.toast(`Simulated bot "${name}" successfully deployed! 🤖`, 'success');
+        nameInput.value = '';
+        await loadBots();
+      }
+    }
+
+    async function toggleBot(botId, newStatus) {
+      if (isLoggedIn) {
+        try {
+          const res = await fetch('/api/demo/bots/toggle', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ botId, status: newStatus }),
+            credentials: 'include'
+          });
+          if (res.ok) {
+            window.stockwise?.toast(`Bot script status updated to: ${newStatus.toUpperCase()}`, 'success');
+            await loadBots();
+          }
+        } catch(e){}
+      } else {
+        const bots = JSON.parse(localStorage.getItem('ca_offline_bots') || '[]');
+        const bot = bots.find(b => b.id === botId);
+        if (bot) {
+          bot.status = newStatus;
+          localStorage.setItem('ca_offline_bots', JSON.stringify(bots));
+
+          // Log toggle
+          const allLogs = JSON.parse(localStorage.getItem('ca_offline_bot_logs') || '{}');
+          allLogs[botId] = allLogs[botId] || [];
+          allLogs[botId].unshift({
+            message: `Bot status updated to: ${newStatus.toUpperCase()}`,
+            created_at: new Date().toISOString()
+          });
+          localStorage.setItem('ca_offline_bot_logs', JSON.stringify(allLogs));
+
+          window.stockwise?.toast(`Simulated bot status updated to: ${newStatus.toUpperCase()}`, 'success');
+          await loadBots();
+        }
+      }
+    }
+
+    async function deleteBot(botId) {
+      if (isLoggedIn) {
+        try {
+          const res = await fetch('/api/demo/bots/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ botId }),
+            credentials: 'include'
+          });
+          if (res.ok) {
+            window.stockwise?.toast('Simulated bot script deleted.', 'success');
+            await loadBots();
+          }
+        } catch(e){}
+      } else {
+        let bots = JSON.parse(localStorage.getItem('ca_offline_bots') || '[]');
+        bots = bots.filter(b => b.id !== botId);
+        localStorage.setItem('ca_offline_bots', JSON.stringify(bots));
+
+        // Delete logs
+        const allLogs = JSON.parse(localStorage.getItem('ca_offline_bot_logs') || '{}');
+        delete allLogs[botId];
+        localStorage.setItem('ca_offline_bot_logs', JSON.stringify(allLogs));
+
+        window.stockwise?.toast('Simulated bot script deleted.', 'success');
+        await loadBots();
+      }
+    }
+
+    function runOfflineBots() {
+      // Runs only in guest mode when activeBotsList is populated from localStorage
+      if (isLoggedIn) return; // Server handles live bots automatically when logged in!
+      
+      const bots = JSON.parse(localStorage.getItem('ca_offline_bots') || '[]');
+      const activeBots = bots.filter(b => b.status === 'active');
+      if (activeBots.length === 0) return;
+
+      const state = getOfflineState();
+      const allLogs = JSON.parse(localStorage.getItem('ca_offline_bot_logs') || '{}');
+
+      activeBots.forEach(bot => {
+        const botId = bot.id;
+        const sym = bot.symbol.toUpperCase();
+        const currentPrice = ASSETS[sym] ? ASSETS[sym].price : 100.0;
+        let params = {};
+        try { params = typeof bot.parameters_json === 'string' ? JSON.parse(bot.parameters_json) : bot.parameters_json || {}; } catch(e){}
+
+        const holding = state.portfolio.find(p => p.symbol === sym);
+        const qtyOwned = holding ? holding.quantity : 0;
+
+        let decision = 'HOLD';
+        let triggerMessage = '';
+
+        // Standard simulated technical signals
+        const rand = Math.random();
+        
+        if (bot.strategy === 'RSI_BOT') {
+          const buyThreshold = params.buy_threshold || 35;
+          const sellThreshold = params.sell_threshold || 65;
+          
+          let rsi = 50;
+          if (rand < 0.25) rsi = Math.floor(Math.random() * buyThreshold);
+          else if (rand > 0.75) rsi = Math.floor(Math.random() * (100 - sellThreshold)) + sellThreshold;
+          else rsi = Math.floor(Math.random() * (sellThreshold - buyThreshold)) + buyThreshold;
+
+          allLogs[botId] = allLogs[botId] || [];
+          allLogs[botId].unshift({
+            message: `Analyzing metrics: RSI level is at ${rsi}.`,
+            created_at: new Date().toISOString()
+          });
+
+          if (rsi <= buyThreshold) {
+            decision = 'BUY';
+            triggerMessage = `RSI reached oversold level (${rsi} <= ${buyThreshold}).`;
+          } else if (rsi >= sellThreshold) {
+            decision = 'SELL';
+            triggerMessage = `RSI reached overbought level (${rsi} >= ${sellThreshold}).`;
+          }
+        } else if (bot.strategy === 'MACD_BOT') {
+          const crossover = rand < 0.2 ? 'bullish' : (rand > 0.8 ? 'bearish' : 'neutral');
+          
+          allLogs[botId] = allLogs[botId] || [];
+          allLogs[botId].unshift({
+            message: `Analyzing metrics: MACD line showing ${crossover} momentum crossover.`,
+            created_at: new Date().toISOString()
+          });
+
+          if (crossover === 'bullish') {
+            decision = 'BUY';
+            triggerMessage = `MACD Bullish Crossover detected.`;
+          } else if (crossover === 'bearish') {
+            decision = 'SELL';
+            triggerMessage = `MACD Bearish Crossover detected.`;
+          }
+        } else if (bot.strategy === 'GRID_BOT') {
+          const gridPercentage = (params.grid_percent || 1.5) / 100;
+          const avgEntry = holding ? holding.avg_buy_price : currentPrice;
+          const priceDiffPct = (currentPrice - avgEntry) / avgEntry;
+
+          allLogs[botId] = allLogs[botId] || [];
+          allLogs[botId].unshift({
+            message: `Grid monitoring: Current price deviates ${(priceDiffPct * 100).toFixed(2)}% from baseline.`,
+            created_at: new Date().toISOString()
+          });
+
+          if (priceDiffPct <= -gridPercentage) {
+            decision = 'BUY';
+            triggerMessage = `Grid lower limit hit (Price deviates ${(priceDiffPct * 100).toFixed(2)}% <= -${(gridPercentage * 100).toFixed(2)}%).`;
+          } else if (priceDiffPct >= gridPercentage && qtyOwned > 0) {
+            decision = 'SELL';
+            triggerMessage = `Grid upper limit hit (Price deviates +${(priceDiffPct * 100).toFixed(2)}% >= +${(gridPercentage * 100).toFixed(2)}%).`;
+          }
+        }
+
+        // Execute Simulated Offline Order
+        if (decision === 'BUY') {
+          const purchaseValue = Math.min(state.balance * 0.15, 800.0);
+          if (purchaseValue >= 10.0) {
+            const qtyToBuy = purchaseValue / currentPrice;
+            state.balance = parseFloat((state.balance - purchaseValue).toFixed(4));
+            
+            const existing = state.portfolio.find(p => p.symbol === sym);
+            if (existing) {
+              const newQty = existing.quantity + qtyToBuy;
+              existing.avg_buy_price = ((existing.avg_buy_price * existing.quantity) + purchaseValue) / newQty;
+              existing.quantity = newQty;
+            } else {
+              state.portfolio.push({ symbol: sym, quantity: qtyToBuy, avg_buy_price: currentPrice });
+            }
+
+            state.trades = state.trades || [];
+            state.trades.push({ type: 'BUY', symbol: sym, quantity: qtyToBuy, price: currentPrice, time: new Date().toLocaleTimeString() });
+            
+            allLogs[botId].unshift({
+              message: `🟢 EXECUTE: ${triggerMessage} Bought ${qtyToBuy.toFixed(5)} ${sym} at $${currentPrice.toLocaleString()} ($${purchaseValue.toFixed(2)} USDT).`,
+              created_at: new Date().toISOString()
+            });
+
+            appendCoachMsg('bot', `🤖 <strong>Offline Bot Order:</strong> Deployed bot <em>"${bot.name}"</em> executed automated BUY of ${qtyToBuy.toFixed(5)} ${sym} at $${currentPrice.toLocaleString()} ($${purchaseValue.toFixed(2)} USDT).`);
+          } else {
+            allLogs[botId].unshift({
+              message: `⚠️ SKIPPED: ${triggerMessage} Insufficient virtual USDT balance ($${state.balance.toFixed(2)} available).`,
+              created_at: new Date().toISOString()
+            });
+          }
+        } else if (decision === 'SELL' && qtyOwned > 0.00001) {
+          const saleValue = qtyOwned * currentPrice;
+          state.balance = parseFloat((state.balance + saleValue).toFixed(4));
+          
+          state.portfolio = state.portfolio.filter(p => p.symbol !== sym);
+          state.trades = state.trades || [];
+          state.trades.push({ type: 'SELL', symbol: sym, quantity: qtyOwned, price: currentPrice, time: new Date().toLocaleTimeString() });
+
+          allLogs[botId].unshift({
+            message: `🔴 EXECUTE: ${triggerMessage} Sold ${qtyOwned.toFixed(5)} ${sym} at $${currentPrice.toLocaleString()} ($${saleValue.toFixed(2)} USDT).`,
+            created_at: new Date().toISOString()
+          });
+
+          appendCoachMsg('bot', `🤖 <strong>Offline Bot Order:</strong> Deployed bot <em>"${bot.name}"</em> executed automated SELL of ${qtyOwned.toFixed(5)} ${sym} at $${currentPrice.toLocaleString()} ($${saleValue.toFixed(2)} USDT).`);
+        }
+
+        // Limit size of logs to prevent memory inflation
+        allLogs[botId] = allLogs[botId].slice(0, 50);
+      });
+
+      // Save states
+      saveOfflineState(state);
+      localStorage.setItem('ca_offline_bot_logs', JSON.stringify(allLogs));
+      
+      // Refresh UI values
+      renderDemoOffline();
+      activeBotsList.forEach(bot => {
+        updateBotConsole(bot.id);
+      });
+    }
+
+    // ─── AI COACH CHAT FEEDBACK ───
+    async function coachTriggerAnalysis() {
+      // Pull dynamic signals generated by the system for the active pair
+      const res = await fetch('/api/signals?count=50');
+      const signals = await res.json();
+      const signalData = signals.find(s => s.sym.toUpperCase() === currentAsset) || signals[0];
+
+      const rsiString = activeIndicators.rsi ? 'RSI indicator oscillates in neutral values (52.4)' : 'Enable RSI in left indicators panel to view oversold triggers';
+      const trend = signalData.pctRaw >= 0 ? 'bullish upward' : 'bearish downward';
+      const actionText = signalData.signal === 'BUY' ? 'BUY LONG (entry targets ready)' : (signalData.signal === 'SELL' ? 'SELL SHORT (hedging short limits)' : 'HOLD (consolidative channels)');
+
+      const analysisReport = `
+        🤖 <strong>AI Technical Report — ${currentAsset}/USDT:</strong>
+        <br><br>
+        • <strong>Market Price:</strong> $${ASSETS[currentAsset].price.toLocaleString()} (${(signalData.pctRaw >= 0 ? '+' : '')}${signalData.pctRaw.toFixed(2)}%)
+        <br>
+        • <strong>Core Signal:</strong> <strong>${signalData.signal}</strong>
+        <br>
+        • <strong>Volatility Index:</strong> ${signalData.vol}
+        <br>
+        • <strong>Trade Levels:</strong> Entry $${signalData.entry} | Target TP $${signalData.target} | Stop SL $${signalData.stop}
+        <br><br>
+        💡 <strong>Indicator Check:</strong> MACD crossover registers ${trend} momentum wicks. ${rsiString}.
+        <br><br>
+        <em>Coach's Advice: The confidence scoring indicates ${signalData.conf}% accuracy limits. I suggest to proceed with a <strong>${actionText}</strong> entry.</em>
+      `;
+
+      appendCoachMsg('user', `Analyze current chart technicals for ${currentAsset}/USDT`);
+      setTimeout(() => {
+        appendCoachMsg('bot', analysisReport);
+      }, 400);
+    }
+
+
+    function coachExplainIndicator(indicator) {
+      let explanation = '';
+      if (indicator === 'RSI') {
+        explanation = `
+          🤖 <strong>Coach Guide — RSI (Relative Strength Index):</strong>
+          <br><br>
+          RSI measures the velocity and magnitude of recent price shifts on a scale from 0 to 100.
+          <br><br>
+          • <strong>Overbought (>70):</strong> The coin has been heavily bought and is mathematically prone to a pullback or trend correction.
+          <br>
+          • <strong>Oversold (<30):</strong> Heavy panic selling has occurred, undervalued conditions are met, and prices are primed for a potential bounce.
+        `;
+      } else if (indicator === 'MACD') {
+        explanation = `
+          🤖 <strong>Coach Guide — MACD (Moving Average Crossover):</strong>
+          <br><br>
+          MACD tracks trend momentum by subtracting the 26-day EMA from the 12-day EMA.
+          <br><br>
+          • <strong>Bullish Crossover:</strong> When the blue MACD line crosses above the orange signal line, it flags bullish momentum is taking over (BUY cue).
+          <br>
+          • <strong>Bearish Crossover:</strong> When MACD crosses below the signal line, it signals strong selling momentum (SELL cue).
+        `;
+      } else {
+        explanation = `
+          🤖 <strong>Coach Guide — Bollinger Bands:</strong>
+          <br><br>
+          Bollinger Bands represent standard deviation envelopes mapped around a moving average price line.
+          <br><br>
+          • Price tends to oscillate inside the bands 90% of the time. Lower band touches indicate oversold supports, whereas upper band touches flag overbought resistances.
+        `;
+      }
+
+      appendCoachMsg('user', `What is ${indicator}?`);
+      setTimeout(() => {
+        appendCoachMsg('bot', explanation);
+      }, 400);
+    }
+
+    function sendCoachChat() {
+      const input = document.getElementById('coachInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendCoachMsg('user', text);
+      input.value = '';
+
+      setTimeout(() => {
+        let reply = '';
+        const low = text.toLowerCase();
+
+        if (low.includes('strategy') || low.includes('bot')) {
+          reply = `I support three strategic templates: <strong>RSI Momentum</strong> (triggers on overbought/oversold boundaries), <strong>MACD trend</strong> (EMA triggers), and <strong>Grid Arbitrage</strong> (collects sideways micro-fluctuations). Select any from the academy to launch scripts.`;
+        } else if (low.includes('risk') || low.includes('loss')) {
+          reply = `Always practice proper risk management! Never allocate more than 3-5% of your total balance to a single coin position, and always keep a tight Stop Loss parameter enabled to protect your capital.`;
+        } else if (low.includes('rsi')) {
+          coachExplainIndicator('RSI');
+          return;
+        } else if (low.includes('macd')) {
+          coachExplainIndicator('MACD');
+          return;
+        } else if (low.includes('bollinger') || low.includes('band')) {
+          coachExplainIndicator('BBands');
+          return;
+        } else {
+          reply = `Interesting query! In the simulated arena, you can read modular articles inside the <strong>Learn Academy</strong> tab to gain XP, or use the practicing order columns to execute test BUY/SELL limits risk-free.`;
+        }
+
+        appendCoachMsg('bot', reply);
+      }, 500);
+    }
+
+    function appendCoachMsg(role, text) {
+      const log = document.getElementById('coachChatLog');
+      const bubble = document.createElement('div');
+      bubble.className = `coach-chat-bubble ${role}`;
+      const name = role === 'bot' ? 'AI' : 'ME';
+      bubble.innerHTML = `
+        <div class="chat-avatar-circle">${name}</div>
+        <div class="chat-bubble-body">${text}</div>
+      `;
+      log.appendChild(bubble);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // ─── ACADEMY STYLING & INTERACTION ───
+    function renderAcademy() {
+      const grid = document.getElementById('academyGrid');
+      grid.innerHTML = ACADEMY_LESSONS.map(lesson => {
+        const completed = completedLessonsList.includes(lesson.id);
+        const icon = completed ? '✅' : '📖';
+        const cText = completed ? 'Completed' : 'Study Lesson';
+        const btnClass = completed ? 'btn-sm outline' : 'btn-sm primary';
+        return `
+          <div class="course-card">
+            <div class="course-level ${lesson.categoryClass}">${lesson.category} Level</div>
+            <h3 style="font-family:'Syne',sans-serif; color:#fff; font-weight:700; font-size:1.05rem; margin-top:0.25rem;">${lesson.title}</h3>
+            <p style="color:var(--ca-text-muted); font-size:0.8rem; line-height:1.5; flex:1;">${lesson.desc}</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.5rem;">
+              <span class="course-progress" style="font-size:0.75rem; color:var(--ca-text-muted);">${icon} ${lesson.xpReward} XP</span>
+              <button class="${btnClass}" onclick="openAcademyLesson('${lesson.id}')" style="font-size:0.75rem; padding:0.4rem 0.8rem;">${cText}</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openAcademyLesson(lessonId) {
+      const lesson = ACADEMY_LESSONS.find(l => l.id === lessonId);
+      if (!lesson) return;
+
+      activeQuizObj = lesson;
+      selectedQuizAnswerIdx = null;
+
+      document.getElementById('academyModalTitle').textContent = lesson.title;
+      document.getElementById('academyModalSubtitle').textContent = `${lesson.category} Level • Reward: ${lesson.xpReward} XP`;
+      document.getElementById('academyLessonContent').innerHTML = lesson.article;
+      document.getElementById('academyQuizQuestion').textContent = lesson.quiz.question;
+
+      const optsContainer = document.getElementById('academyQuizOptions');
+      optsContainer.innerHTML = lesson.quiz.options.map((opt, idx) => {
+        return `
+          <button class="quiz-opt-btn" onclick="selectQuizOption(${idx}, this)" style="background:rgba(255,255,255,0.01); border:1px solid var(--ca-border)">
+            ${idx + 1}. ${opt}
+          </button>
+        `;
+      }).join('');
+
+      document.getElementById('academyPopup').classList.add('open');
+    }
+
+    function selectQuizOption(idx, btn) {
+      selectedQuizAnswerIdx = idx;
+      document.querySelectorAll('.quiz-opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    }
+
+    async function submitAcademyQuizAnswer() {
+      if (selectedQuizAnswerIdx === null) {
+        window.stockwise?.toast('Please select an option first!', 'error');
+        return;
+      }
+
+      if (selectedQuizAnswerIdx !== activeQuizObj.quiz.correctIdx) {
+        window.stockwise?.toast('Incorrect answer. Try reading the lesson material again!', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/demo/academy/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lessonId: activeQuizObj.id, xpReward: activeQuizObj.xpReward }),
+          credentials: 'include'
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          closeAcademyPopup();
+          window.stockwise?.toast(`Correct answer! +${activeQuizObj.xpReward} XP earned. 🎉`, 'success');
+          
+          triggerConfetti();
+
+          await loadAccountData();
+          renderAcademy();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function closeAcademyPopup() {
+      document.getElementById('academyPopup').classList.remove('open');
+      activeQuizObj = null;
+    }
+
+    // Confetti animation helper
+    function triggerConfetti() {
+      const container = document.getElementById('confettiOverlay');
+      container.style.display = 'block';
+      container.innerHTML = '';
+
+      for (let i = 0; i < 60; i++) {
+        const confetti = document.createElement('div');
+        const colors = ['#00e5a0', '#00bfff', '#ff6b6b', '#ffd32a', '#a78bfa'];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        confetti.style.cssText = `
+          position: absolute;
+          width: 8px;
+          height: 8px;
+          background: ${randomColor};
+          top: -10px;
+          left: ${Math.random() * 100}vw;
+          border-radius: 50%;
+          opacity: ${Math.random()};
+          transform: rotate(${Math.random() * 360}deg);
+          animation: confettiDrop ${Math.random() * 2 + 1.5}s linear forwards;
+        `;
+        container.appendChild(confetti);
+      }
+
+      setTimeout(() => {
+        container.style.display = 'none';
+      }, 3500);
+    }
+
+    // Inject confetti keyframes dynamic
+    const styleSheet = document.createElement("style");
+    styleSheet.innerText = `
+      @keyframes confettiDrop {
+        to {
+          transform: translateY(105vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(styleSheet);
+
+    // ─── AI COACH TUTORIAL GUIDE ("Teach Me to Trade") ───
+    function startCoachTutorial() {
+      coachTutorialStep = 1;
+      appendCoachMsg('user', '🎓 I want to learn how to trade! Teach me the basics.');
+      setTimeout(() => {
+        const text = `
+          🎓 <strong>AI Trading Coach — Step 1: The Order Book & Market Spread</strong> 📖
+          <br><br>
+          In trading, assets are bought and sold using a live ledger called an <strong>Order Book</strong>. It records all pending transactions:
+          <ul>
+            <li>🟢 <strong>Bids (Buy Orders)</strong>: Orders placed by buyers wanting to buy at lower prices. The highest bid is the <em>best buying price</em>.</li>
+            <li>🔴 <strong>Asks (Sell Orders)</strong>: Orders placed by sellers wanting to sell at higher prices. The lowest ask is the <em>best selling price</em>.</li>
+            <li>⚖️ <strong>The Spread</strong>: The difference between the highest bid and lowest ask. A small spread indicates high liquidity and volume.</li>
+          </ul>
+          Look at the live prices fluctuating on the left side panel. They represent these real bid/ask intersections!
+          <br><br>
+          <button onclick="nextCoachTutorialStep()" style="display:block; width:100%; margin-top:0.75rem; background:var(--ca-green); color:#000; border:none; border-radius:6px; padding:0.45rem; font-family:inherit; font-size:0.75rem; font-weight:700; cursor:pointer;">Continue to Step 2: Reading Candlesticks →</button>
+        `;
+        appendCoachMsg('bot', text);
+      }, 600);
+    }
+
+    function nextCoachTutorialStep() {
+      coachTutorialStep++;
+      if (coachTutorialStep === 2) {
+        appendCoachMsg('user', 'Show me how to read candlesticks.');
+        setTimeout(() => {
+          const text = `
+            🎓 <strong>AI Trading Coach — Step 2: How to Read Candlesticks</strong> 🕯️
+            <br><br>
+            A candlestick maps price fluctuations over a set timeframe (e.g., 1 Hour or 1 Day):
+            <ul>
+              <li>🟢 <strong>Bullish Candle (Green)</strong>: Open is at the bottom, Close is at the top. The price went up!</li>
+              <li>🔴 <strong>Bearish Candle (Red)</strong>: Open is at the top, Close is at the bottom. The price went down!</li>
+              <li>📊 <strong>The Body & Wicks</strong>: The thick body represents the range between Open and Close. The thin wicks/shadows show the extreme High and Low prices touched during that period.</li>
+              <li>⚡ <strong>Hammer Pattern</strong>: A tiny body with a very long lower wick. It shows sellers dominated early, but buyers aggressively pushed prices back up. This is a highly bullish trend reversal signal!</li>
+            </ul>
+            Try toggling <strong>'Candle'</strong> mode on the toolbar above the chart to view these candlesticks!
+            <br><br>
+            <button onclick="nextCoachTutorialStep()" style="display:block; width:100%; margin-top:0.75rem; background:var(--ca-green); color:#000; border:none; border-radius:6px; padding:0.45rem; font-family:inherit; font-size:0.75rem; font-weight:700; cursor:pointer;">Continue to Step 3: Technical Indicators →</button>
+          `;
+          appendCoachMsg('bot', text);
+        }, 600);
+      } else if (coachTutorialStep === 3) {
+        appendCoachMsg('user', 'Teach me about technical indicators.');
+        setTimeout(() => {
+          const text = `
+            🎓 <strong>AI Trading Coach — Step 3: Mastering Indicators (RSI & MACD)</strong> 📈
+            <br><br>
+            Indicators are mathematical calculations based on price history. Let's cover the two most popular indicators:
+            <ul>
+              <li>📊 <strong>RSI (Relative Strength Index)</strong>: Oscillates between 0 and 100 to show momentum.
+                <ul>
+                  <li><strong>RSI > 70</strong>: Overbought. Price is highly stretched and primed for a downward correction.</li>
+                  <li><strong>RSI < 30</strong>: Oversold. Selling pressure is exhausted, and a bullish bounce is likely!</li>
+                </ul>
+              </li>
+              <li>📉 <strong>MACD (Moving Average Crossover)</strong>: Tracks price trend velocity.
+                <ul>
+                  <li><strong>Bullish Crossover</strong>: Blue MACD line crosses above the orange signal line (Strong BUY signal).</li>
+                  <li><strong>Bearish Crossover</strong>: MACD crosses below the signal line (Strong SELL signal).</li>
+                </ul>
+              </li>
+            </ul>
+            Toggle these indicators in the left panel to display them on the chart!
+            <br><br>
+            <button onclick="nextCoachTutorialStep()" style="display:block; width:100%; margin-top:0.75rem; background:var(--ca-green); color:#000; border:none; border-radius:6px; padding:0.45rem; font-family:inherit; font-size:0.75rem; font-weight:700; cursor:pointer;">Continue to Step 4: Bot & Grid Trading →</button>
+          `;
+          appendCoachMsg('bot', text);
+        }, 600);
+      } else if (coachTutorialStep === 4) {
+        appendCoachMsg('user', 'How do automated trading bots work?');
+        setTimeout(() => {
+          const text = `
+            🎓 <strong>AI Trading Coach — Step 4: Bot & Grid Trading Automation</strong> 🤖
+            <br><br>
+            Instead of watching charts all day, you can deploy **automated scripts** to trade for you:
+            <ul>
+              <li>🤖 <strong>RSI Momentum Bots</strong>: Automatically place BUY orders when the coin is oversold (RSI < 35) and SELL orders when it is overbought (RSI > 65).</li>
+              <li>🔄 <strong>Grid Scalper Bots</strong>: Perform best in a sideways range-bound market. The bot sets buy limits below the current price and sell limits above. As price moves sideways, it buys the dips and sells the rips, scalping consistent micro-profits!</li>
+            </ul>
+            Go to the <strong>'Bots'</strong> tab on the right to deploy a bot, customize its parameters, and watch its live log console!
+            <br><br>
+            🎉 <strong>Congratulations! You have completed the AI Trading Coach Tutorial!</strong><br>
+            As a graduation reward, you have earned <strong>50 practice XP points</strong>!
+            <br><br>
+            <button onclick="finishCoachTutorial()" style="display:block; width:100%; margin-top:0.75rem; background:var(--ca-blue); color:#fff; border:none; border-radius:6px; padding:0.45rem; font-family:inherit; font-size:0.75rem; font-weight:700; cursor:pointer;">Finish & Go to Bots Tab 🤖</button>
+          `;
+          appendCoachMsg('bot', text);
+        }, 600);
+      }
+    }
+
+    async function finishCoachTutorial() {
+      appendCoachMsg('user', 'Finish lesson. Let\'s trade!');
+      
+      // Attempt server completion or award offline XP
+      if (isLoggedIn) {
+        try {
+          await fetch('/api/demo/academy/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lessonId: 'coach_tutorial', xpReward: 50 }),
+            credentials: 'include'
+          });
+          await loadAccountData();
+        } catch(e){}
+      } else {
+        // Guest mode experience boost
+        showToast('Graduation reward! +50 simulated XP earned. 🎉', 'success');
+      }
+
+      triggerConfetti();
+      switchRightTab('bots');
+    }
+
+    function selectTradingMode(mode) {
+      const modal = document.getElementById('modeSelectorModal');
+      if (modal) modal.style.display = 'none';
+
+      if (mode === 'ai') {
+        startVisualIntroTour();
+      } else {
+        dismissIntroTour();
+      }
+    }
+
+    // ─── AI INTRO TUTORIAL SPOTLIGHT TOUR ───
+    let visualTourStep = 0;
+    
+    function startVisualIntroTour() {
+      visualTourStep = 1;
+      appendCoachMsg('user', '🎓 Yes, guide me through the Trading Arena layout!');
+      
+      // Elevate right sidebar above the spotlight shadow
+      document.querySelector('.ca-sidebar-right').classList.add('tour-active');
+      
+      // Step 1: Spotlight sidebar markets
+      setTimeout(() => {
+        document.querySelector('.ca-sidebar-left').classList.add('tour-highlight');
+        
+        const text = `
+          🎓 <strong>Stage 1: Markets & Technical Indicators</strong> 📊
+          <br><br>
+          Look at the <strong>Markets Sidebar</strong> currently spotlighted on the far left:
+          <ul>
+            <li>✨ This lists 12 major cryptos with real-time price feeds.</li>
+            <li>🔄 You can switch currencies between **USDT** (CoinGecko feeds) and **INR** (CoinDCX tickers) at the top of the header. All values and portfolio balances adapt instantly!</li>
+            <li>📈 Below, you can toggle indicators like **RSI oscillators**, **Bollinger envelopes**, and **EMA lines** to overlay them on the chart.</li>
+          </ul>
+          <br>
+          <button onclick="nextVisualTourStep()" style="display:block; width:100%; background:var(--ca-green); color:#000; border:none; border-radius:6px; padding:0.5rem; font-family:inherit; font-size:0.75rem; font-weight:700; cursor:pointer;">Proceed to Stage 2: Technical Chart →</button>
+        `;
+        appendCoachMsg('bot', text);
+      }, 500);
+    }
+
+    function nextVisualTourStep() {
+      // Remove previous highlights
+      document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight'));
+      
+      visualTourStep++;
+      if (visualTourStep === 2) {
+        appendCoachMsg('user', 'Show me the technical chart canvas.');
+        setTimeout(() => {
+          document.getElementById('chartWrap').classList.add('tour-highlight');
+          
+          const text = `
+            🎓 <strong>Stage 2: TradingView Candlestick Chart</strong> 🕯️
+            <br><br>
+            The spotlighted center contains our **Interactive Canvas Chart**:
+            <ul>
+              <li>📊 It draws green (\`#089981\`) and red (\`#f23645\`) solid candlesticks, sharp wicks, and translucent Bollinger envelopes.</li>
+              <li>🎯 Hovering over the graph reveals vertical/horizontal crosshair lines tracking your cursor.</li>
+              <li>📈 An elegant floating **OHLC HUD panel** is drawn directly on-canvas in the top-left, listing open, high, low, close, and volume details.</li>
+            </ul>
+            <br>
+            <button onclick="nextVisualTourStep()" style="display:block; width:100%; background:var(--ca-green); color:#000; border:none; border-radius:6px; padding:0.5rem; font-family:inherit; font-size:0.75rem; font-weight:700; cursor:pointer;">Proceed to Stage 3: Order Ticket Terminal →</button>
+          `;
+          appendCoachMsg('bot', text);
+        }, 500);
+      } else if (visualTourStep === 3) {
+        appendCoachMsg('user', 'Explain the practice order terminal.');
+        setTimeout(() => {
+          document.querySelector('.sim-terminal-box').classList.add('tour-highlight');
+          
+          const text = `
+            🎓 <strong>Stage 3: Practice Trade Terminal</strong> 📥
+            <br><br>
+            Look at the spotlighted panel at the bottom, your **Order Ticket Ticket**:
+            <ul>
+              <li>💰 Here you place test trades using your virtual practice funds ($10,000 cash). No real money at risk!</li>
+              <li>🚀 I have added **quick percentage pills (25% - 100%)** below the quantity inputs. Clicking these automatically computes the maximum size you can afford, based on proper asset risk margins!</li>
+              <li>💼 All trades are converted to USDT baseline standards inside our databases, letting you practice currency-safe transacting.</li>
+            </ul>
+            <br>
+            <button onclick="nextVisualTourStep()" style="display:block; width:100%; background:var(--ca-green); color:#000; border:none; border-radius:6px; padding:0.5rem; font-family:inherit; font-size:0.75rem; font-weight:700; cursor:pointer;">Proceed to Stage 4: Automated Scripts & Bots →</button>
+          `;
+          appendCoachMsg('bot', text);
+        }, 500);
+      } else if (visualTourStep === 4) {
+        appendCoachMsg('user', 'How do automated trading bots deploy?');
+        setTimeout(() => {
+          switchRightTab('bots');
+          document.querySelector('.ca-sidebar-right').classList.add('tour-highlight');
+          
+          const text = `
+            🎓 <strong>Stage 4: Automated Telemetry Bots</strong> 🤖
+            <br><br>
+            Look at the right panel tab, your **Bots Configurator Dashboard**:
+            <ul>
+              <li>🛠️ You can deploy simulated Grid scalping algorithms or RSI/MACD scripts instantly.</li>
+              <li>📋 Each deployed telemetry card contains a **collapsible monospace terminal console** streaming operations logs directly from active intervals!</li>
+              <li>🔄 Practice account balances and holdings update automatically when bots execute triggers.</li>
+            </ul>
+            <br>
+            <button onclick="finishVisualTour()" style="display:block; width:100%; background:var(--ca-blue); color:#fff; border:none; border-radius:6px; padding:0.5rem; font-family:inherit; font-size:0.75rem; font-weight:700; cursor:pointer; text-align:center;">Finish Tour & Graduate! 🎉</button>
+          `;
+          appendCoachMsg('bot', text);
+        }, 500);
+      }
+    }
+
+    function finishVisualTour() {
+      document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight'));
+      document.querySelector('.ca-sidebar-right').classList.remove('tour-active');
+      switchRightTab('coach');
+      
+      appendCoachMsg('user', 'Let\'s start practicing trading!');
+      
+      setTimeout(() => {
+        const text = `
+          🎉 <strong>Congratulations! You have completed the Trading Arena Spotlight Tour!</strong>
+          <br><br>
+          I have rewarded your profile with <strong>+25 experience points (XP)</strong> for learning layout controls.
+          <br><br>
+          💡 <strong>What next?</strong>
+          <ul>
+            <li>Click assets on the left to inspect their wicks.</li>
+            <li>Practice placing a BUY limit or deploy an automated Grid Bot.</li>
+            <li>Ask me any questions about trading!</li>
+          </ul>
+        `;
+        appendCoachMsg('bot', text);
+        
+        // Award XP
+        if (isLoggedIn) {
+          fetch('/api/demo/academy/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lessonId: 'visual_intro_tour', xpReward: 25 }),
+            credentials: 'include'
+          }).then(() => loadAccountData());
+        } else {
+          showToast('Spotlight Tour graduated! +25 simulated XP. 🎉', 'success');
+        }
+        
+        triggerConfetti();
+      }, 500);
+      
+      localStorage.setItem('ca_intro_seen', 'true');
+    }
+
+    function dismissIntroTour() {
+      appendCoachMsg('user', 'Let me explore the Trading Arena on my own.');
+      document.querySelector('.ca-sidebar-right').classList.remove('tour-active');
+      setTimeout(() => {
+        appendCoachMsg('bot', `Understandable! If you ever need coaching, click the "Guided Academy Tour" button in the intro, click courses in the **Learn** tab, or ask me technical questions here anytime! Good luck trading.`);
+      }, 400);
+      localStorage.setItem('ca_intro_seen', 'true');
+    }
+
+    // Quick percentage allocators helper
+    function setTradeQtyPercent(side, pct) {
+      const price = ASSETS[currentAsset].price;
+      if (side === 'buy') {
+        const displayBalance = selectedCurrency === 'INR' ? demoBalance * tetherRate : demoBalance;
+        const totalAllocated = displayBalance * pct;
+        const qty = (totalAllocated * 0.99) / price;
+        document.getElementById('buyQty').value = qty.toFixed(currentAsset === 'SHIB' ? 1 : 4);
+      } else {
+        let holdingQty = 0;
+        if (isLoggedIn) {
+          const row = demoPortfolio.find(p => p.symbol.toUpperCase() === currentAsset);
+          if (row) holdingQty = row.quantity;
+        } else {
+          const state = getOfflineState();
+          const row = state.portfolio.find(p => p.symbol.toUpperCase() === currentAsset);
+          if (row) holdingQty = row.quantity;
+        }
+        const qty = holdingQty * pct;
+        document.getElementById('sellQty').value = qty.toFixed(currentAsset === 'SHIB' ? 1 : 4);
+      }
+    }
+
+    // ─── AUTH HELPER ───
+    function openAuth(tab) {
+      document.getElementById('authModal').classList.add('open');
+    }
+    function closeAuth() {
+      document.getElementById('authModal').classList.remove('open');
+    }
+    async function doLogin(e) {
+      e.preventDefault();
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPass').value })
+      });
+      const d = await res.json();
+      if (d.error) {
+        document.getElementById('authError').textContent = d.error;
+        return;
+      }
+      closeAuth();
+      if (window.stockwise?.makeAuthFresh) await window.stockwise.makeAuthFresh();
+      window.stockwise?.toast('Practice Account synced successfully!', 'success');
+      loadAccountData();
+    }
+
+    // ─── SIMULATED LIVE ORDER BOOK GENERATOR ───
+    function updateOrderBook() {
+      const obAsks = document.getElementById('obAsksList');
+      const obBids = document.getElementById('obBidsList');
+      const obPrice = document.getElementById('obCurrentPrice');
+      const obSpread = document.getElementById('obSpreadVal');
+      if (!obAsks || !obBids) return;
+
+      const coin = currentAsset;
+      const assetData = ASSETS[coin];
+      if (!assetData) return;
+
+      const currentPrice = assetData.price;
+      const prefix = selectedCurrency === 'INR' ? '₹' : '$';
+      const dec = coin === 'SHIB' ? 6 : (coin === 'ADA' || coin === 'XRP' || currentPrice < 1 ? 4 : 2);
+
+      // Update header currency/token units in Order Book headers
+      const quoteUnits = document.querySelectorAll('.ob-quote-unit');
+      const baseUnits = document.querySelectorAll('.ob-base-unit');
+      quoteUnits.forEach(el => el.textContent = selectedCurrency);
+      baseUnits.forEach(el => el.textContent = coin);
+
+      // Dynamic Seed for consistent but realistic Order Book values
+      const seed = currentPrice;
+      let rng = seed;
+      function seededRand() {
+        rng = (rng * 9301 + 49297) % 233280;
+        return rng / 233280;
+      }
+
+      // Generate 5 bids and 5 asks
+      const bids = [];
+      const asks = [];
+
+      // Ask step deviation and sizes
+      for (let i = 1; i <= 5; i++) {
+        const priceDev = 1 + (i * 0.0004) + (seededRand() * 0.0001);
+        const askPrice = currentPrice * priceDev;
+        const sizeBase = currentPrice > 1000 ? 0.08 : (currentPrice > 10 ? 8 : (currentPrice > 0.1 ? 80 : 8000));
+        const size = (seededRand() * 2 + 0.1) * sizeBase;
+        asks.push({ price: askPrice, size: size });
+      }
+
+      // Bid step deviation and sizes
+      for (let i = 1; i <= 5; i++) {
+        const priceDev = 1 - (i * 0.0004) - (seededRand() * 0.0001);
+        const bidPrice = currentPrice * priceDev;
+        const sizeBase = currentPrice > 1000 ? 0.08 : (currentPrice > 10 ? 8 : (currentPrice > 0.1 ? 80 : 8000));
+        const size = (seededRand() * 2 + 0.1) * sizeBase;
+        bids.push({ price: bidPrice, size: size });
+      }
+
+      // Sort: Asks ascending
+      asks.sort((a, b) => a.price - b.price);
+      // Sort: Bids descending
+      bids.sort((a, b) => b.price - a.price);
+
+      // Compute cumulative sizes for depth
+      let cumAsk = 0;
+      const processedAsks = asks.map(a => {
+        cumAsk += a.size;
+        return { ...a, total: cumAsk };
+      });
+      const maxAskTotal = cumAsk;
+
+      let cumBid = 0;
+      const processedBids = bids.map(b => {
+        cumBid += b.size;
+        return { ...b, total: cumBid };
+      });
+      const maxBidTotal = cumBid;
+
+      const maxTotal = Math.max(maxAskTotal, maxBidTotal) || 1;
+
+      // Render Asks
+      obAsks.innerHTML = processedAsks.map(a => {
+        const depthPct = Math.min(100, (a.total / maxTotal) * 100);
+        return `
+          <div class="ob-row" onclick="prefillOrderBookPrice(${a.price.toFixed(dec)})">
+            <div class="ob-depth-fill" style="width: ${depthPct}%;"></div>
+            <span class="ob-col price">${a.price.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec })}</span>
+            <span class="ob-col size">${a.size.toLocaleString('en-US', { minimumFractionDigits: coin === 'SHIB' ? 1 : 4, maximumFractionDigits: coin === 'SHIB' ? 1 : 4 })}</span>
+            <span class="ob-col total">${a.total.toLocaleString('en-US', { minimumFractionDigits: coin === 'SHIB' ? 1 : 2, maximumFractionDigits: coin === 'SHIB' ? 1 : 2 })}</span>
+          </div>
+        `;
+      }).join('');
+
+      // Render Bids
+      obBids.innerHTML = processedBids.map(b => {
+        const depthPct = Math.min(100, (b.total / maxTotal) * 100);
+        return `
+          <div class="ob-row" onclick="prefillOrderBookPrice(${b.price.toFixed(dec)})">
+            <div class="ob-depth-fill" style="width: ${depthPct}%;"></div>
+            <span class="ob-col price">${b.price.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec })}</span>
+            <span class="ob-col size">${b.size.toLocaleString('en-US', { minimumFractionDigits: coin === 'SHIB' ? 1 : 4, maximumFractionDigits: coin === 'SHIB' ? 1 : 4 })}</span>
+            <span class="ob-col total">${b.total.toLocaleString('en-US', { minimumFractionDigits: coin === 'SHIB' ? 1 : 2, maximumFractionDigits: coin === 'SHIB' ? 1 : 2 })}</span>
+          </div>
+        `;
+      }).join('');
+
+      // Update spreads
+      const bestAsk = asks[0].price;
+      const bestBid = bids[0].price;
+      const spread = bestAsk - bestBid;
+      const spreadPct = (spread / bestBid) * 100;
+
+      obPrice.textContent = prefix + currentPrice.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+      const isUp = assetData.change >= 0;
+      obPrice.style.color = isUp ? 'var(--ca-green)' : 'var(--ca-red)';
+
+      obSpread.textContent = prefix + spread.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + ` (${spreadPct.toFixed(2)}%)`;
+    }
+
+    function prefillOrderBookPrice(price) {
+      const buyPrice = document.getElementById('buyPrice');
+      const sellPrice = document.getElementById('sellPrice');
+      if (buyPrice) buyPrice.value = price;
+      if (sellPrice) sellPrice.value = price;
+      showToast(`Terminal pre-filled price: ${price}`, 'success');
+    }
+  </script>
+</body>
+</html>

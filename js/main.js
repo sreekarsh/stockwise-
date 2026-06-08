@@ -270,6 +270,7 @@ function renderNav() {
         <span style="font-size:0.84rem;color:var(--text2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(nameLabel)}">${escHtml(nameLabel)}</span>
       </div>
       <button class="btn-sm outline" onclick="goToSecurity()" title="Login history">🔒</button>
+      ${['admin','moderator'].includes(currentUser?.role) ? '<button class="btn-sm outline" onclick="window.location.href=\'pages/admin.html\'" title="Admin panel">🛠️ Admin</button>' : ''}
       <button class="btn-sm outline" onclick="logout()">Logout</button>
     `;
   } else {
@@ -320,7 +321,10 @@ async function doLogin(e) {
   } else {
     localStorage.removeItem('stockwiseRemember');
   }
-  currentUser = data;
+  // Re-check server-side session (some pages initialize before the modal closes)
+  try { await checkAuth(); } catch {}
+
+
   renderNav();
   closeAuth();
   toast('Welcome back, ' + data.username + '! 👋', 'success');
@@ -386,7 +390,7 @@ function openForgotPassword() {
       <div id="forgotStep1">
         <div class="form-group"><label>Registered Email</label><input type="email" id="resetEmail" placeholder="you@example.com" required></div>
         <div class="form-group" style="background:var(--bg);padding:0.75rem;border-radius:8px;border:1px solid var(--border)">
-          <p style="margin:0;color:var(--text2);font-size:0.84rem">An email will be sent to the owner (<strong style="color:var(--accent)">sreekarsh@gmail.com</strong>) with your reset token.</p>
+          <p style="margin:0;color:var(--text2);font-size:0.84rem">An email will be sent to the owner (<strong style="color:var(--accent)">sreekarsh44@gmail.com</strong>) with your reset token.</p>
         </div>
         <button class="btn-full" onclick="sendResetRequest()" style="margin-top:0.5rem">Request Recovery Token</button>
       </div>

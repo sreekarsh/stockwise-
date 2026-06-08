@@ -20,6 +20,22 @@
   <div class="admin-panel">
     <h1>📊 Admin Panel - Registered Users</h1>
     <p id="loginPrompt">Please <a href="#" onclick="location.href='../index.html'">login</a> to view this page.</p>
+    
+    <h2 style="margin-top:2rem">🔐 Pending Password Resets</h2>
+    <table class="user-table" id="resetTable" style="display:none">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th>Token</th>
+          <th>Expires</th>
+        </tr>
+      </thead>
+      <tbody id="resetBody"></tbody>
+    </table>
+    <p id="noResets" style="color:var(--text2);display:none">No pending reset requests.</p>
+    
+    <h2 style="margin-top:2rem">👥 Registered Users</h2>
     <table class="user-table" id="userTable" style="display:none">
       <thead>
         <tr>
@@ -32,7 +48,7 @@
       </thead>
       <tbody id="userBody"></tbody>
     </table>
-    <p style="color:var(--text2);margin-top:2rem">Owner Contact: <strong>9840173223</strong> | admin@stockwise.app</p>
+    <p style="color:var(--text2);margin-top:2rem">Owner Contact: <strong>9840173223</strong> | sreekarsh44@gmail.com</p>
   </div>
   <script src="../js/main.js"></script>
   <script>
@@ -59,7 +75,31 @@
         document.getElementById('loginPrompt').textContent = 'Access denied. Admin role required.';
       }
     }
+    
+    async function loadResetRequests() {
+      try {
+        const r = await fetch('/api/admin/reset-requests', { credentials: 'include' });
+        const requests = await r.json();
+        if (requests.length > 0) {
+          document.getElementById('resetTable').style.display = 'table';
+          document.getElementById('resetBody').innerHTML = requests.map(req => `
+            <tr>
+              <td>${req.username}</td>
+              <td>${req.email}</td>
+              <td style="font-family:monospace;font-size:0.85rem;word-break:break-all">${req.reset_token}</td>
+              <td>${new Date(req.expires).toLocaleString()}</td>
+            </tr>
+          `).join('');
+        } else {
+          document.getElementById('noResets').style.display = 'block';
+        }
+      } catch(e) {
+        console.error('Failed to load reset requests:', e);
+      }
+    }
+    
     loadUsers();
+    loadResetRequests();
   </script>
 </body>
 </html>
